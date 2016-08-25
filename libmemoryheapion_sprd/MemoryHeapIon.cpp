@@ -30,7 +30,7 @@
 
 #include <binder/MemoryHeapBase.h>
 
-#include "MemoryHeapIon_SPRD.h"
+#include "MemoryHeapIon.h"
 
 #ifdef USE_TARGET_SIMULATOR_MODE
 #include <linux/ion.h>
