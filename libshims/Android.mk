@@ -19,6 +19,10 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_SRC_FILES := ril_shim.cpp
+ifeq ($(TARGET_BOARD_PLATFORM),scx15)
+LOCAL_SRC_FILES += ril_prop_shim.cpp utils.cpp
+LOCAL_CPPFLAGS += -fexceptions
+endif
 LOCAL_SHARED_LIBRARIES := libbinder
 LOCAL_MODULE := libril_shim
 LOCAL_MODULE_TAGS := optional
