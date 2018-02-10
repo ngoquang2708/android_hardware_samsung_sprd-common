@@ -18,7 +18,8 @@
 #include <time.h>
 #include <signal.h>
 #include <sys/time.h>
-
+#include "eng_audio.h"
+#include <alsa_pcm_util.h>
 
 //#ifdef __cplusplus
 //extern "c"

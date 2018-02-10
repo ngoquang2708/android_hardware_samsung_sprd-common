@@ -16,6 +16,7 @@
 #include "aud_enha.h"
 #include <cutils/sockets.h>
 
+#include <alsa_pcm_util.h>
 
 //#ifdef __cplusplus
 //extern "c"
