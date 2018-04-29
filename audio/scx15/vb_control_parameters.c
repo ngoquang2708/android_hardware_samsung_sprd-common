@@ -421,10 +421,10 @@ static int32_t GetAudio_mode_number_from_device(struct tiny_audio_device *adev)
 
     }else if(adev->out_devices & AUDIO_DEVICE_OUT_EARPIECE){
         lmode = 2;  //handset
-    }else if((adev->out_devices & AUDIO_DEVICE_OUT_SPEAKER) || (adev->out_devices & AUDIO_DEVICE_OUT_FM_SPEAKER)){
+    }else if((adev->out_devices & AUDIO_DEVICE_OUT_SPEAKER)){
         lmode = 3;  //handsfree
     }else if((adev->out_devices & AUDIO_DEVICE_OUT_WIRED_HEADSET) || (adev->out_devices & AUDIO_DEVICE_OUT_WIRED_HEADPHONE)
-            || (adev->out_devices & AUDIO_DEVICE_OUT_FM_HEADSET) || (adev->in_devices & AUDIO_DEVICE_IN_WIRED_HEADSET)){
+            || (adev->in_devices & AUDIO_DEVICE_IN_WIRED_HEADSET)){
         lmode = 0;  //headset
     }else{
         ALOGW("%s device(0x%x) is not support, set default:handsfree \n",__func__,adev->out_devices);
@@ -595,14 +595,7 @@ static int SetAudio_gain_by_devices(struct tiny_audio_device *adev, pga_gain_nv_
             audio_pga_apply(adev->pga,pga_gain_nv->dac_pga_gain_r,"headphone-r");
         }
     }
-    if(pga_gain_nv->out_devices & AUDIO_DEVICE_OUT_FM_HEADSET){
-        audio_pga_apply(adev->pga,pga_gain_nv->fm_pga_gain_l,"linein-hp-l");
-        audio_pga_apply(adev->pga,pga_gain_nv->fm_pga_gain_r,"linein-hp-r");
-    }else if(pga_gain_nv->out_devices & AUDIO_DEVICE_OUT_FM_SPEAKER){
-        audio_pga_apply(adev->pga,pga_gain_nv->fm_pga_gain_l,"linein-spk-l");
-        audio_pga_apply(adev->pga,pga_gain_nv->fm_pga_gain_r,"linein-spk-r");
-        mixer_ctl_set_value(adev->private_ctl.internal_pa, 0, pga_gain_nv->fm_pa_config);
-    }else if((pga_gain_nv->in_devices & AUDIO_DEVICE_IN_BUILTIN_MIC) || (pga_gain_nv->in_devices & AUDIO_DEVICE_IN_BACK_MIC) || (pga_gain_nv->in_devices & AUDIO_DEVICE_IN_WIRED_HEADSET)){
+    if((pga_gain_nv->in_devices & AUDIO_DEVICE_IN_BUILTIN_MIC) || (pga_gain_nv->in_devices & AUDIO_DEVICE_IN_BACK_MIC) || (pga_gain_nv->in_devices & AUDIO_DEVICE_IN_WIRED_HEADSET)){
         audio_pga_apply(adev->pga,pga_gain_nv->adc_pga_gain_l,"capture-l");
         audio_pga_apply(adev->pga,pga_gain_nv->adc_pga_gain_r,"capture-r");
     }

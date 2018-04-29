@@ -546,13 +546,11 @@ typedef struct {
 }dev_names_para_t;
 
 static const dev_names_para_t dev_names_linein[] = {
-    { AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_FM_SPEAKER, "speaker" },
-    { AUDIO_DEVICE_OUT_WIRED_HEADSET | AUDIO_DEVICE_OUT_WIRED_HEADPHONE | AUDIO_DEVICE_OUT_FM_HEADSET, "headphone" },
+    { AUDIO_DEVICE_OUT_SPEAKER, "speaker" },
+    { AUDIO_DEVICE_OUT_WIRED_HEADSET | AUDIO_DEVICE_OUT_WIRED_HEADPHONE, "headphone" },
     { AUDIO_DEVICE_OUT_EARPIECE, "earpiece" },
     /* ANLG for voice call via linein*/
-    { AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET | AUDIO_DEVICE_OUT_ALL_FM, "line" },
-    { AUDIO_DEVICE_OUT_FM_HEADSET, "line-headphone" },
-    { AUDIO_DEVICE_OUT_FM_SPEAKER, "line-speaker" },
+    { AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET, "line" },
 
     { AUDIO_DEVICE_IN_COMMUNICATION, "comms" },
     { AUDIO_DEVICE_IN_AMBIENT, "ambient" },
@@ -564,13 +562,11 @@ static const dev_names_para_t dev_names_linein[] = {
     //{ "linein-capture"},
 };
 static const dev_names_para_t dev_names_digitalfm[] = {
-    { AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_FM_SPEAKER, "speaker" },
-    { AUDIO_DEVICE_OUT_WIRED_HEADSET | AUDIO_DEVICE_OUT_WIRED_HEADPHONE | AUDIO_DEVICE_OUT_FM_HEADSET, "headphone" },
+    { AUDIO_DEVICE_OUT_SPEAKER, "speaker" },
+    { AUDIO_DEVICE_OUT_WIRED_HEADSET | AUDIO_DEVICE_OUT_WIRED_HEADPHONE, "headphone" },
     { AUDIO_DEVICE_OUT_EARPIECE, "earpiece" },
     /* ANLG for voice call via linein*/
     { AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET, "line" },
-    { AUDIO_DEVICE_OUT_ALL_FM, "digital-fm" },
-
 
     { AUDIO_DEVICE_IN_COMMUNICATION, "comms" },
     { AUDIO_DEVICE_IN_AMBIENT, "ambient" },
@@ -1041,31 +1037,7 @@ ret);
 	/* separate INPUT/OUTPUT case for some common bit used. */
         if ((adev->out_devices & adev->dev_cfgs[i].mask)
 	    && !(adev->dev_cfgs[i].mask & AUDIO_DEVICE_BIT_IN)) {
-        if(AUDIO_DEVICE_OUT_ALL_FM == adev->dev_cfgs[i].mask && adev->pcm_fm_dl == NULL){
-#if 0
-            ALOGE("%s:open FM device",__func__);
-            pthread_mutex_lock(&adev->lock);
-            //force_all_standby(adev);
-            adev->pcm_fm_dl= pcm_open(s_tinycard, PORT_FM, PCM_OUT, &pcm_config_fm_dl);
-            if (!pcm_is_ready(adev->pcm_fm_dl)) {
-            ALOGE("%s:cannot open pcm_fm_dl : %s", __func__,pcm_get_error(adev->pcm_fm_dl));
-            pcm_close(adev->pcm_fm_dl);
-            adev->pcm_fm_dl= NULL;
-            } else {
-              if( 0 != pcm_start(adev->pcm_fm_dl)){
-                  ALOGE("%s:pcm_fm_dl start unsucessfully: %s", __func__,pcm_get_error(adev->pcm_fm_dl));
-              }
-              if(adev->master_mute){
-                  ALOGV("open FM and set codec unmute");
-                  set_codec_mute_forFM(adev,false);
-              }
-            }
-            pthread_mutex_unlock(&adev->lock);
-#else
-            fm_open = 1;
-            ALOGE("%s:Will open FM device",__func__);
-#endif
-        }
+
             set_route_by_array(adev->mixer, adev->dev_cfgs[i].on,
                     adev->dev_cfgs[i].on_len);
     }
@@ -1089,18 +1061,6 @@ ret);
 	    && !(adev->dev_cfgs[i].mask & AUDIO_DEVICE_BIT_IN)) {
             set_route_by_array(adev->mixer, adev->dev_cfgs[i].off,
                     adev->dev_cfgs[i].off_len);
-        if(AUDIO_DEVICE_OUT_ALL_FM == adev->dev_cfgs[i].mask && adev->pcm_fm_dl != NULL)
-        {
-            ALOGE("%s:close FM device",__func__);
-            pthread_mutex_lock(&adev->lock);
-            pcm_close(adev->pcm_fm_dl);
-            adev->pcm_fm_dl= NULL;
-            if(adev->master_mute){
-                ALOGV("close FM so we set codec to mute by master_mute");
-                set_codec_mute_forFM(adev,true);
-            }
-            pthread_mutex_unlock(&adev->lock);
-        }
         }
 
         if (!((adev->in_devices & ~AUDIO_DEVICE_BIT_IN) & adev->dev_cfgs[i].mask)
@@ -1854,7 +1814,7 @@ static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
         ALOGW("[out_set_parameters],after str_parms_get_str,val(0x%x) ",val);
         pthread_mutex_lock(&adev->lock);
         pthread_mutex_lock(&out->lock);
-	if (((adev->out_devices & AUDIO_DEVICE_OUT_ALL) != val) && ((val != 0) || ((val == 0) && (adev->out_devices & AUDIO_DEVICE_OUT_ALL_FM))) //val=0 will cause XRUN. So ignore the "val=0"expect for closing FM path.
+	if (((adev->out_devices & AUDIO_DEVICE_OUT_ALL) != val) && ((val != 0)) //val=0 will cause XRUN. So ignore the "val=0"expect for closing FM path.
                   || (AUDIO_MODE_IN_CALL == adev->mode)
                   ||adev->voip_start) {
             adev->out_devices &= ~AUDIO_DEVICE_OUT_ALL;
@@ -1862,14 +1822,6 @@ static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
             out->devices = val;
             ALOGW("out_set_parameters want to set devices:0x%x old_mode:%d new_mode:%d call_start:%d ",adev->out_devices,cur_mode,adev->mode,adev->call_start);
 
-            if ((val & AUDIO_DEVICE_OUT_ALL_FM)
-                    && (adev->call_start || AUDIO_MODE_IN_CALL == adev->mode || adev->voip_start)) {
-                ALOGW("[out_set_parameters], devices:0x%x mode:%d call_start:%d voip_start:%d",
-                        val,adev->mode,adev->call_start,adev->voip_start);
-                pthread_mutex_unlock(&out->lock);
-                pthread_mutex_unlock(&adev->lock);
-                return 0;
-            }
             if(1 == adev->call_start) {
                 if(adev->out_devices & (AUDIO_DEVICE_OUT_SPEAKER | AUDIO_DEVICE_OUT_ALL_SCO)) {
                     if(adev->cp_type == CP_TG)
@@ -2669,55 +2621,30 @@ static int start_input_stream(struct tiny_stream_in *in)
 
     }
     else {
-        if(adev->out_devices & AUDIO_DEVICE_OUT_ALL_FM){
-            in->config = pcm_config_fm_ul;
-            if(in->config.channels != in->requested_channels) {
-              in->config.channels = in->requested_channels;
-            }
-           in->pcm = pcm_open(s_tinycard, PORT_MM, PCM_IN, &in->config);
-           if(!pcm_is_ready(in->pcm)) {
-             pcm_close(in->pcm);
-             ALOGE("fm rec cannot open pcm_in driver : %s,samplerate:%d", pcm_get_error(in->pcm),in->config.rate);
-             in->pcm = NULL;
-           }
-           if(NULL == in->pcm){
-               in->config =  pcm_config_mm_ul;
-               in->config.rate = MM_LOW_POWER_SAMPLING_RATE;
-               if(in->config.channels != in->requested_channels) {
-                 in->config.channels = in->requested_channels;
-               }
-               ALOGE("fm rec try to open pcm_in driver again using samplerate:%d",in->config.rate);
-               in->pcm = pcm_open(s_tinycard, PORT_MM, PCM_IN, &in->config);
-               if(!pcm_is_ready(in->pcm)) {
-                 goto err;
-               }
-           }
-        } else {
-          in->config = pcm_config_mm_ul;
-          if(in->config.channels != in->requested_channels) {
-              in->config.channels = in->requested_channels;
-            }
+	    in->config = pcm_config_mm_ul;
+	    if(in->config.channels != in->requested_channels) {
+	        in->config.channels = in->requested_channels;
+	    }
 
-            if(in->config.rate != in->requested_rate)
-            {
-                in->config.rate = in->requested_rate;
-            }
-            ALOGE("start_input_stream pcm_open_0");
-            in->pcm = pcm_open(s_tinycard, PORT_MM, PCM_IN, &in->config);
-            if(!pcm_is_ready(in->pcm)) {
-                if(in->pcm) {
-                    pcm_close(in->pcm);
-                    in->pcm = NULL;
-                }
-                in->config.rate = pcm_config_mm_ul.rate;
-                ALOGE("start_input_stream pcm_open_1");
-                in->pcm = pcm_open(s_tinycard, PORT_MM, PCM_IN, &in->config);
-                if(!pcm_is_ready(in->pcm)) {
-                    ALOGE("start_input_stream pcm open err");
-                    goto err;
-                }
-            }
-        }
+	    if(in->config.rate != in->requested_rate)
+	    {
+	        in->config.rate = in->requested_rate;
+	    }
+	    ALOGE("start_input_stream pcm_open_0");
+	    in->pcm = pcm_open(s_tinycard, PORT_MM, PCM_IN, &in->config);
+	    if(!pcm_is_ready(in->pcm)) {
+	        if(in->pcm) {
+	            pcm_close(in->pcm);
+	            in->pcm = NULL;
+	        }
+	        in->config.rate = pcm_config_mm_ul.rate;
+	        ALOGE("start_input_stream pcm_open_1");
+	        in->pcm = pcm_open(s_tinycard, PORT_MM, PCM_IN, &in->config);
+	        if(!pcm_is_ready(in->pcm)) {
+	            ALOGE("start_input_stream pcm open err");
+	            goto err;
+	        }
+	    }
         /* start to process pcm data captured, such as noise suppression.*/
         in->active_rec_proc = init_rec_process(GetAudio_InMode_number_from_device(adev),in->requested_rate);
         ALOGI("record process module created is %s.", in->active_rec_proc ? "successful" : "failed");
@@ -3545,9 +3472,6 @@ static int adev_set_voice_volume(struct audio_hw_device *dev, float volume)
 {
     struct tiny_audio_device *adev = (struct tiny_audio_device *)dev;
     ALOGW("[adev_set_voice_volume], devices:0x%x ",adev->out_devices);
-    if (adev->out_devices & AUDIO_DEVICE_OUT_ALL_FM) {
-        return 0;
-    }
     BLUE_TRACE("adev_set_voice_volume in...volume:%f mode:%d call_start:%d ",volume,adev->mode,adev->call_start);
     adev->voice_volume = volume;
     /*Send at command to cp side*/
@@ -3864,7 +3788,6 @@ static uint32_t adev_get_supported_devices(const struct audio_hw_device *dev)
             AUDIO_DEVICE_OUT_ANLG_DOCK_HEADSET |
             AUDIO_DEVICE_OUT_DGTL_DOCK_HEADSET |
             AUDIO_DEVICE_OUT_ALL_SCO |
-            AUDIO_DEVICE_OUT_ALL_FM |
             AUDIO_DEVICE_OUT_DEFAULT |
             /* IN */
             AUDIO_DEVICE_IN_COMMUNICATION |
@@ -3876,7 +3799,6 @@ static uint32_t adev_get_supported_devices(const struct audio_hw_device *dev)
             AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET |
             AUDIO_DEVICE_IN_ALL_SCO |
             AUDIO_DEVICE_IN_VOICE_CALL |
-            AUDIO_DEVICE_IN_FM_TUNER |
             AUDIO_DEVICE_IN_DEFAULT);
 }
 

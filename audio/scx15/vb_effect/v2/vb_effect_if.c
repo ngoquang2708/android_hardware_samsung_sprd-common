@@ -35,13 +35,6 @@
 #include "aud_enha.h"
 #include "vb_effect_if.h"
 
-#ifndef AUDIO_DEVICE_OUT_FM_HEADSET
-#define AUDIO_DEVICE_OUT_FM_HEADSET 0x1000000
-#endif
-#ifndef AUDIO_DEVICE_OUT_FM_SPEAKER
-#define AUDIO_DEVICE_OUT_FM_SPEAKER 0x2000000
-#endif
-
 #define VBC_VERSION     "vbc.r0p0"
 
 #define VBC_EQ_FIRMWARE_MAGIC_LEN       (4)
@@ -716,14 +709,12 @@ int vb_effect_profile_apply(void)
             //ret = mixer_ctl_set_enum_by_string(s_ctl_eq_select, "Handset");
             ret = mixer_ctl_set_value(s_ctl_da_eq_profile_select, 0, 2);
             ALOGI("profile is Handset, ret=%d", ret);
-        }else if((s_cur_out_devices & AUDIO_DEVICE_OUT_SPEAKER)
-                ||(s_cur_out_devices & AUDIO_DEVICE_OUT_FM_SPEAKER) ){
+        }else if((s_cur_out_devices & AUDIO_DEVICE_OUT_SPEAKER)){
             //ret = mixer_ctl_set_enum_by_string(s_ctl_eq_select, "Handsfree");
             ret = mixer_ctl_set_value(s_ctl_da_eq_profile_select, 0, 3);
             ALOGI("profile is Handsfree, ret=%d", ret);
         }else if((s_cur_out_devices & AUDIO_DEVICE_OUT_WIRED_HEADSET)
                 ||(s_cur_out_devices & AUDIO_DEVICE_OUT_WIRED_HEADPHONE)
-                ||(s_cur_out_devices & AUDIO_DEVICE_OUT_FM_HEADSET)
                 ||(s_cur_in_devices & AUDIO_DEVICE_IN_WIRED_HEADSET)){
             //ret = mixer_ctl_set_enum_by_string(s_ctl_eq_select, "Headset");
             ret = mixer_ctl_set_value(s_ctl_da_eq_profile_select, 0, 0);
