@@ -49,7 +49,7 @@ LOCAL_SHARED_LIBRARIES := \
 	liblog \
 	libc \
 	libcutils \
-	libtinyalsa_sprd \
+	libtinyalsa \
 	libtinyalsautils \
 	libnvexchange \
 

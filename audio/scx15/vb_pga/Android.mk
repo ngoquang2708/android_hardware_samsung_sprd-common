@@ -41,7 +41,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libc \
 	libcutils \
 	liblog \
-	libtinyalsa_sprd \
+	libtinyalsa \
 	libtinyalsautils \
 	libaudioutils \
 	libexpat \

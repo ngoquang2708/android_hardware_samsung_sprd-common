@@ -64,7 +64,7 @@ endif
 LOCAL_SHARED_LIBRARIES := \
 	liblog \
 	libcutils \
-	libtinyalsa_sprd \
+	libtinyalsa \
 	libtinyalsautils \
 	libaudioutils \
 	libexpat \
@@ -78,7 +78,7 @@ LOCAL_SHARED_LIBRARIES := \
 LOCAL_REQUIRED_MODULES := \
 	liblog \
 	libcutils \
-	libtinyalsa_sprd \
+	libtinyalsa \
 	libaudioutils \
 	libexpat \
 	libdl \
