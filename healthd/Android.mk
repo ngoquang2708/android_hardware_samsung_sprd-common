@@ -21,4 +21,5 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := healthd.cpp
 LOCAL_MODULE := libhealthd.$(TARGET_BOARD_PLATFORM)
 LOCAL_C_INCLUDES := system/core/healthd/include
+LOCAL_SHARED_LIBRARIES := libbase
 include $(BUILD_STATIC_LIBRARY)
