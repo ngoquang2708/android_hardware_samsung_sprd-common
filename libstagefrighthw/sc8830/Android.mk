@@ -38,6 +38,7 @@ LOCAL_EXPORT_C_INCLUDE_DIRS := \
 
 LOCAL_SHARED_LIBRARIES := \
 	libmemoryheapion_sprd \
+	liblog \
 	libutils \
 	libcutils \
 	libui \
@@ -45,6 +46,8 @@ LOCAL_SHARED_LIBRARIES := \
 	libstagefright_foundation \
 
 LOCAL_MODULE := libstagefrighthw
+
+LOCAL_PROPRIETARY_MODULE := true
 
 LOCAL_CFLAGS:= -DLOG_TAG=\"$(TARGET_BOARD_PLATFORM).libstagefright\"
 
