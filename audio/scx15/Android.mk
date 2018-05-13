@@ -90,6 +90,8 @@ LOCAL_REQUIRED_MODULES := \
 
 LOCAL_MODULE_TAGS := optional
 
+LOCAL_PROPRIETARY_MODULE := true
+
 include $(BUILD_SHARED_LIBRARY)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
