@@ -107,7 +107,7 @@ private_handle_t* SprdDisplayPlane:: createPlaneBuffer(int index)
     GraphicBufferAllocator::get().allocate(
             mWidth,
             mHeight,
-            Format,
+            mFormat,
             1 /* layerCount XXX HACK? */,
             mPlaneUsage,
             (buffer_handle_t*)&BufHandle,
