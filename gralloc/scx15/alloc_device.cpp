@@ -242,6 +242,12 @@ static int gralloc_alloc_ionbuffer(alloc_device_t* dev, size_t size, int usage, 
 }
 #endif
 
+static uint64_t next_backing_store_id()
+{
+    static std::atomic<uint64_t> next_id(1);
+    return next_id++;
+}
+
 static int gralloc_alloc_buffer(alloc_device_t* dev, size_t size, int usage, buffer_handle_t* pHandle)
 {
     #if GRALLOC_ARM_DMA_BUF_MODULE
@@ -652,6 +658,7 @@ AllocNormalBuffer:
 	hnd->height = h;
 	hnd->format = format;
 	hnd->stride = stride;
+	hnd->backing_store = next_backing_store_id();
 
 	*pStride = stride;
 	return 0;
