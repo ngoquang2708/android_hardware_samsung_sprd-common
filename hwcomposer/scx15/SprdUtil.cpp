@@ -405,7 +405,16 @@ int SprdUtil:: acquireTmpBuffer(int width, int height, int format, private_handl
 
 AllocGFXBuffer:
 #ifdef GSP_ADDR_TYPE_PHY
-    GraphicBufferAllocator::get().allocate(width, height, format, GRALLOC_USAGE_OVERLAY_BUFFER, (buffer_handle_t*)&tmpBuffer, &stride, getUniqueId(), std::move("HWC"));
+    GraphicBufferAllocator::get().allocate(
+            width,
+            height,
+            format,
+            1 /* layerCount XXX HACK? */,
+            GRALLOC_USAGE_OVERLAY_BUFFER,
+            (buffer_handle_t*)&tmpBuffer,
+            &stride,
+            getUniqueId(),
+            std::move("HWC"));
 #elif defined (GSP_ADDR_TYPE_IOVA)
     GraphicBufferAllocator::get().alloc(width, height, format, 0, (buffer_handle_t*)&tmpBuffer, &stride);
 #endif

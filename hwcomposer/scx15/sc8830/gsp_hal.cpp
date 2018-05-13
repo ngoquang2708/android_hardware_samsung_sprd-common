@@ -1047,10 +1047,12 @@ int transform_layer(uint32_t srcPhy,//src  phy_addr_y
         gsp_cfg_info.layer0_info.img_format = GSP_SRC_FMT_YUV420_2P;
         gsp_cfg_info.layer0_info.endian_mode.uv_word_endn = GSP_WORD_ENDN_0;//GSP_WORD_ENDN_1--not correct
         break;
+#if 0
     case HAL_PIXEL_FORMAT_YCrCb_420_SP:
         gsp_cfg_info.layer0_info.img_format = GSP_SRC_FMT_YUV420_2P;//?
         gsp_cfg_info.layer0_info.endian_mode.uv_word_endn = GSP_WORD_ENDN_1;//?
         break;
+#endif
     case HAL_PIXEL_FORMAT_YV12:
         gsp_cfg_info.layer0_info.img_format = GSP_SRC_FMT_YUV420_3P;//?
         break;

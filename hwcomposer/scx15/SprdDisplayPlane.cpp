@@ -104,7 +104,16 @@ private_handle_t* SprdDisplayPlane:: createPlaneBuffer(int index)
         return NULL;
     }
 
-    GraphicBufferAllocator::get().allocate(mWidth, mHeight, mFormat, mPlaneUsage, (buffer_handle_t*)&BufHandle, &stride, getUniqueId(), std::move("HWC"));
+    GraphicBufferAllocator::get().allocate(
+            mWidth,
+            mHeight,
+            Format,
+            1 /* layerCount XXX HACK? */,
+            mPlaneUsage,
+            (buffer_handle_t*)&BufHandle,
+            &stride,
+            getUniqueId(),
+            std::move("HWC"));
     if (BufHandle == NULL)
     {
         ALOGE("SprdDisplayPlane cannot alloc buffer");
