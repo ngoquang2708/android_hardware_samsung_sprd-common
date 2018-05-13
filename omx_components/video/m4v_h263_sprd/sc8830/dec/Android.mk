@@ -37,5 +37,6 @@ LOCAL_SHARED_LIBRARIES := \
 
 LOCAL_MODULE := libstagefright_sprd_mpeg4dec
 LOCAL_MODULE_TAGS := optional
+LOCAL_PROPRIETARY_MODULE := true
 
 include $(BUILD_SHARED_LIBRARY)
