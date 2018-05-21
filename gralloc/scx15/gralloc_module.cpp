@@ -560,6 +560,7 @@ int gralloc_perform(struct gralloc_module_t const* module,
 			break;
 		}
 
+#ifdef ADVERTISE_GRALLOC1
 		case GRALLOC1_ADAPTER_PERFORM_GET_REAL_MODULE_API_VERSION_MINOR:
 		{
 			auto outMinorVersion = va_arg(args, int*);
@@ -635,8 +636,9 @@ int gralloc_perform(struct gralloc_module_t const* module,
 			*outStride = hnd->width;
 			break;
 		}
+#endif // ADVERTISE_GRALLOC1
 	}
-#endif
+#endif // GRALLOC_ARM_UMP_MODULE
 	va_end(args);
 	return res;
 }
