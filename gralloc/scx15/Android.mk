@@ -42,11 +42,11 @@ LOCAL_SHARED_LIBRARIES := \
 	liblog \
 	libcutils \
 	libGLESv1_CM \
-	libui \
 	libsync \
 	$(SHARED_MEM_LIBS) \
 
 LOCAL_STATIC_LIBRARIES := \
+	libarect \
 	libgralloc1-adapter \
 
 LOCAL_C_INCLUDES := \
