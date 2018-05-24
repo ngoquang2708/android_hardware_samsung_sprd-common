@@ -27,9 +27,8 @@
 
 #include <gralloc1-adapter.h>
 
-//#include <linux/ion.h>
-#include "usr/include/linux/ion.h"
-#include "ion_sprd.h"
+#include <linux/ion.h>
+#include <video/ion_sprd.h>
 
 #include "gralloc_priv.h"
 #include "alloc_device.h"
