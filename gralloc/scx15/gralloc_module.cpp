@@ -447,8 +447,8 @@ int gralloc_perform(struct gralloc_module_t const* module,
 	int res = -EINVAL;
 	va_list args;
 	va_start(args, operation);
-#if GRALLOC_ARM_UMP_MODULE
 	switch (operation) {
+#if GRALLOC_ARM_UMP_MODULE
 		case GRALLOC_MODULE_PERFORM_CREATE_HANDLE_FROM_BUFFER:
 		{
 			int fd = va_arg(args, int);
@@ -558,6 +558,7 @@ int gralloc_perform(struct gralloc_module_t const* module,
 			}
 			break;
 		}
+#endif // GRALLOC_ARM_UMP_MODULE
 
 #ifdef ADVERTISE_GRALLOC1
 		case GRALLOC1_ADAPTER_PERFORM_GET_REAL_MODULE_API_VERSION_MINOR:
@@ -637,7 +638,6 @@ int gralloc_perform(struct gralloc_module_t const* module,
 		}
 #endif // ADVERTISE_GRALLOC1
 	}
-#endif // GRALLOC_ARM_UMP_MODULE
 	va_end(args);
 	return res;
 }
