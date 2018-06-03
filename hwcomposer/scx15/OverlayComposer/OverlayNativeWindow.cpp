@@ -34,7 +34,9 @@
 #include <hardware/hwcomposer.h>
 #include <hardware/hardware.h>
 #include <sys/ioctl.h>
-#include "sprd_fb.h"
+
+#include <video/sprd_fb.h>
+
 #include "SyncThread.h"
 
 #include "OverlayNativeWindow.h"

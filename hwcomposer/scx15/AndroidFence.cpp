@@ -39,9 +39,10 @@
 #include <hardware/hardware.h>
 #include <ion/ion.h>
 #include <linux/ion.h>
-#include "ion_sprd.h"
-#include "AndroidFence.h"
+#include <video/ion_sprd.h>
 #include <cutils/log.h>
+
+#include "AndroidFence.h"
 #include "SprdDisplayDevice.h"
 
 using namespace android;

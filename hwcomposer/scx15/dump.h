@@ -4,16 +4,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include <system/graphics.h>
-#include<stdlib.h>
+#include <stdlib.h>
+
+#include <video/sprd_fb.h>
+
 #include <cutils/log.h>
 
-//LOCAL_SHARED_LIBRARIES := libcutils
+#include <system/graphics.h>
 #include <cutils/properties.h>
 #include <hardware/hwcomposer.h>
 #include <hardware/hardware.h>
+
 #include "gralloc_priv.h"
-#include "sprd_fb.h"
 
 #define BI_RGB          0
 #define BI_BITFIELDS    3

@@ -26,7 +26,8 @@
 #include <stdlib.h>
 #include <hardware/hardware.h>
 
-#include <gsp_types_shark.h>
+#include <video/gsp_types_shark.h>
+
 #include "../sc8825/dcam_hal.h"
 
 
