@@ -409,7 +409,7 @@ AllocGFXBuffer:
             width,
             height,
             format,
-            1 /* layerCount XXX HACK? */,
+            1 /* layerCount */,
             GRALLOC_USAGE_OVERLAY_BUFFER,
             (buffer_handle_t*)&tmpBuffer,
             &stride,

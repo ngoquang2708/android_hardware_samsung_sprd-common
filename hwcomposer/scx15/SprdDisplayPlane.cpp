@@ -108,7 +108,7 @@ private_handle_t* SprdDisplayPlane:: createPlaneBuffer(int index)
             mWidth,
             mHeight,
             mFormat,
-            1 /* layerCount XXX HACK? */,
+            1 /* layerCount */,
             mPlaneUsage,
             (buffer_handle_t*)&BufHandle,
             &stride,
