@@ -25,15 +25,16 @@
 #include <media/stagefright/MediaErrors.h>
 #include <media/IOMX.h>
 #include <media/hardware/HardwareAPI.h>
+#include <ui/Rect.h>
 #include <ui/GraphicBufferMapper.h>
 
 #include "gralloc_priv.h"
 #include "m4v_h263_dec_api.h"
+
 #include <dlfcn.h>
-#include "ion_sprd.h"
+#include <video/ion_sprd.h>
 
-//#define VIDEODEC_CURRENT_OPT  /*only open for SAMSUNG currently*/
-
+#define VIDEODEC_CURRENT_OPT
 
 namespace android {
 

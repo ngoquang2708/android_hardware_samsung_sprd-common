@@ -43,10 +43,12 @@ LOCAL_SHARED_LIBRARIES := \
 	libstagefright_foundation \
 	libstagefrighthw \
 	libmemoryheapion_sprd \
+	libmedia \
 	libutils \
 	libui \
 	libdl \
-	libcutils
+	libcutils \
+	liblog \
 
 LOCAL_MODULE := libstagefright_sprd_aacdec
 LOCAL_MODULE_TAGS := optional

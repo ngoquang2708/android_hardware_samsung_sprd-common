@@ -11,10 +11,10 @@ LOCAL_C_INCLUDES := \
 	frameworks/native/include/media/hardware \
 	frameworks/native/include \
 	$(LOCAL_PATH)/../../../../../gralloc/$(TARGET_BOARD_PLATFORM) \
-	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/video
+	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include \
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
-	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
+	INSTALLED_KERNEL_HEADERS \
 
 LOCAL_CFLAGS := \
 	-DOSCL_EXPORT_REF= \
@@ -28,6 +28,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libstagefright_foundation \
 	libstagefrighthw \
 	libmemoryheapion_sprd \
+	libmedia \
 	libutils \
 	libui \
 	libdl \

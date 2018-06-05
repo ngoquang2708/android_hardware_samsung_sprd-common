@@ -31,16 +31,14 @@
 
 #include <ui/Rect.h>
 #include <ui/GraphicBufferMapper.h>
-//#include <gui/ISurfaceTexture.h>
 
 #include <linux/ion.h>
+#include <video/ion_sprd.h>
 #include <MemoryHeapIon.h>
 
 #include <dlfcn.h>
 
 #include "SPRDMPEG4Encoder.h"
-#include "ion_sprd.h"
-
 
 #define VIDEOENC_CURRENT_OPT
 

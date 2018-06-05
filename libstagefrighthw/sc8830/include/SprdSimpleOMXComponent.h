@@ -29,6 +29,11 @@ namespace android {
 
 struct ALooper;
 
+struct CodecProfileLevel {
+    OMX_U32 mProfile;
+    OMX_U32 mLevel;
+};
+
 struct SprdSimpleOMXComponent : public SprdOMXComponent {
     SprdSimpleOMXComponent(
             const char *name,

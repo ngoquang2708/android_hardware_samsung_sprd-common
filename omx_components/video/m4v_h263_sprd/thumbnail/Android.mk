@@ -21,9 +21,10 @@ LOCAL_SHARED_LIBRARIES := \
 	libstagefright_foundation \
 	libstagefrighthw \
 	libmemoryheapion_sprd \
+	libmedia \
 	libutils \
 	libdl \
-	liblog
+	liblog \
 
 LOCAL_MODULE := libstagefright_sprd_soft_mpeg4dec
 LOCAL_MODULE_TAGS := optional
