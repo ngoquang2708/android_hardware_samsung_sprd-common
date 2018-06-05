@@ -25,11 +25,15 @@ LOCAL_C_INCLUDES := \
     $(TOP)/frameworks/av/include \
     $(TOP)/frameworks/native/include/media/hardware \
     $(TOP)/frameworks/native/include/media/openmax
+LOCAL_CFLAGS := \
+    -DHAL_PIXEL_FORMAT_YCbCr_420_P=0x13 \
+    -DHAL_PIXEL_FORMAT_YCbCr_420_SP=0x19
 LOCAL_SHARED_LIBRARIES := \
     libcamera_client \
     libnativewindow \
     libstagefright \
     libstagefright_foundation \
+    libstagefright_omx_utils \
     liblog
 LOCAL_MODULE := libstagefright_shim
 LOCAL_MODULE_TAGS := optional

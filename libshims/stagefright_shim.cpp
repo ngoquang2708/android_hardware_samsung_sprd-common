@@ -18,44 +18,63 @@
 #define LOG_TAG "libstagefright_shim"
 #include <utils/Log.h>
 
+#include <system/window.h>
+
 #include <OMX_Component.h>
 #include <camera/Camera.h>
 #include <camera/CameraParameters.h>
 #include <media/stagefright/ACodec.h>
 #include <media/stagefright/CameraSource.h>
 #include <media/stagefright/SurfaceUtils.h>
+#include <media/stagefright/omx/OMXUtils.h>
 
 namespace android
 {
 
-template<class T>
-static void InitOMXParams(T *params)
-{
-    memset(params, 0, sizeof(T));
-    params->nSize = sizeof(T);
-    params->nVersion.s.nVersionMajor = 1;
-    params->nVersion.s.nVersionMinor = 0;
-    params->nVersion.s.nRevision = 0;
-    params->nVersion.s.nStep = 0;
-}
-
 status_t ACodec::setupNativeWindowSizeFormatAndUsage(
         ANativeWindow *nativeWindow /* nonnull */, int *finalUsage /* nonnull */,
-        bool reconnect)
-{
+        bool reconnect) {
     OMX_PARAM_PORTDEFINITIONTYPE def;
     InitOMXParams(&def);
     def.nPortIndex = kPortIndexOutput;
 
-    status_t err = mOMX->getParameter(
-            mNode, OMX_IndexParamPortDefinition, &def, sizeof(def));
+    status_t err = mOMXNode->getParameter(
+            OMX_IndexParamPortDefinition, &def, sizeof(def));
 
     if (err != OK) {
         return err;
     }
 
+    OMX_INDEXTYPE index;
+    err = mOMXNode->getExtensionIndex(
+            "OMX.google.android.index.AndroidNativeBufferConsumerUsage",
+            &index);
+
+    if (err != OK) {
+        // allow failure
+        err = OK;
+    } else {
+        int usageBits = 0;
+        if (nativeWindow->query(
+                nativeWindow,
+                NATIVE_WINDOW_CONSUMER_USAGE_BITS,
+                &usageBits) == OK) {
+            OMX_PARAM_U32TYPE params;
+            InitOMXParams(&params);
+            params.nPortIndex = kPortIndexOutput;
+            params.nU32 = (OMX_U32)usageBits;
+
+            err = mOMXNode->setParameter(index, &params, sizeof(params));
+
+            if (err != OK) {
+                ALOGE("Fail to set AndroidNativeBufferConsumerUsage: %d", err);
+                return err;
+            }
+        }
+    }
+
     OMX_U32 usage = 0;
-    err = mOMX->getGraphicBufferUsage(mNode, kPortIndexOutput, &usage);
+    err = mOMXNode->getGraphicBufferUsage(kPortIndexOutput, &usage);
     if (err != 0) {
         ALOGW("querying usage flags from OMX IL component failed: %d", err);
         // XXX: Currently this error is logged, but not fatal.
@@ -90,7 +109,7 @@ status_t ACodec::setupNativeWindowSizeFormatAndUsage(
     }
 
     ALOGV("gralloc usage: %#x(OMX) => %#x(ACodec)", omxUsage, usage);
-    err = setNativeWindowSizeFormatAndUsage(
+    return setNativeWindowSizeFormatAndUsage(
             nativeWindow,
             def.format.video.nFrameWidth,
             def.format.video.nFrameHeight,
@@ -98,7 +117,6 @@ status_t ACodec::setupNativeWindowSizeFormatAndUsage(
             mRotationDegrees,
             usage,
             reconnect);
-    return err;
 }
 
 } // namespace android
