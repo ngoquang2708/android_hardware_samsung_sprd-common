@@ -22,22 +22,22 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libmemoryheapion_sprd
 
 LOCAL_SRC_FILES := \
-	MemoryHeapIon.cpp
+	MemoryHeapIon.cpp \
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
-	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
+	INSTALLED_KERNEL_HEADERS \
 
 LOCAL_C_INCLUDES += \
-	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
+	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include \
 
 LOCAL_EXPORT_C_INCLUDE_DIRS := \
-	$(LOCAL_PATH)
+	$(LOCAL_PATH) \
 
 LOCAL_SHARED_LIBRARIES := \
 	libbinder \
 	liblog \
 	libcutils \
-	libutils
+	libutils \
 
 ifeq ($(TARGET_DEVICE),grandprimeve3g)
 LOCAL_POST_INSTALL_CMD := \
