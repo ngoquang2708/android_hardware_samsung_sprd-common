@@ -44,8 +44,8 @@ LOCAL_SHARED_LIBRARIES := \
 	liblog \
 
 LOCAL_POST_INSTALL_CMD := \
-	$(hide) mkdir -p $(TARGET_OUT_SHARED_LIBRARIES); \
-	ln -sf /vendor/lib/$(LOCAL_MODULE).so $(TARGET_OUT_SHARED_LIBRARIES)/libion.so;
+	$(hide) mkdir -p $(TARGET_OUT_VENDOR_SHARED_LIBRARIES); \
+	ln -sf $(LOCAL_MODULE).so $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/libion.so;
 
 include $(BUILD_SHARED_LIBRARY)
 
