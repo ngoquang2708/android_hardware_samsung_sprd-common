@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := \
-	SPRDMPEG4Decoder.cpp
+	SPRDMPEG4Decoder.cpp \
 
 LOCAL_C_INCLUDES := \
 	frameworks/av/media/libstagefright/include \
@@ -12,8 +12,8 @@ LOCAL_C_INCLUDES := \
 	frameworks/native/include/ui \
 	frameworks/native/include/utils \
 	frameworks/native/include/media/hardware \
-	$(LOCAL_PATH)/../../../../../gralloc/$(TARGET_BOARD_PLATFORM) \
-	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
+	hardware/sprd/gralloc/$(TARGET_BOARD_PLATFORM) \
+	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include \
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
 	INSTALLED_KERNEL_HEADERS \
@@ -21,9 +21,6 @@ LOCAL_ADDITIONAL_DEPENDENCIES += \
 LOCAL_CFLAGS := \
 	-DOSCL_EXPORT_REF= \
 	-DOSCL_IMPORT_REF= \
-	-DGRALLOC_USAGE_OVERLAY_BUFFER=0x01000000 \
-	-DGRALLOC_USAGE_VIDEO_BUFFER=0x02000000 \
-	-DGRALLOC_USAGE_CAMERA_BUFFER=0x04000000 \
 
 LOCAL_ARM_MODE := arm
 
@@ -37,7 +34,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libutils \
 	libui \
 	libdl \
-	liblog
+	liblog \
 
 LOCAL_MODULE := libstagefright_sprd_mpeg4dec
 LOCAL_MODULE_TAGS := optional

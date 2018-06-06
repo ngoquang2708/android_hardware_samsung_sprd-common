@@ -28,6 +28,8 @@
 #include <media/stagefright/SurfaceUtils.h>
 #include <media/stagefright/omx/OMXUtils.h>
 
+#include "gralloc_priv.h"
+
 namespace android
 {
 

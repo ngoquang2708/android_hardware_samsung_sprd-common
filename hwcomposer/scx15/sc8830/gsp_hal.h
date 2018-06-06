@@ -29,6 +29,7 @@
 #include <video/gsp_types_shark.h>
 
 #include "../sc8825/dcam_hal.h"
+#include "gralloc_priv.h"
 
 
 

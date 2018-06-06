@@ -10,7 +10,7 @@ LOCAL_C_INCLUDES := \
 	frameworks/native/include/media/openmax \
 	frameworks/native/include/media/hardware \
 	frameworks/native/include \
-	$(LOCAL_PATH)/../../../../../gralloc/$(TARGET_BOARD_PLATFORM) \
+	hardware/sprd/gralloc/$(TARGET_BOARD_PLATFORM) \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include \
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
@@ -18,7 +18,7 @@ LOCAL_ADDITIONAL_DEPENDENCIES += \
 
 LOCAL_CFLAGS := \
 	-DOSCL_EXPORT_REF= \
-	-DOSCL_IMPORT_REF=
+	-DOSCL_IMPORT_REF= \
 
 LOCAL_ARM_MODE := arm
 

@@ -86,6 +86,17 @@ typedef enum
 	MALI_YUV_BT709_WIDE,
 } mali_gralloc_yuv_info;
 
+enum {
+	HAL_PIXEL_FORMAT_YCbCr_420_P	= 0x13,
+	HAL_PIXEL_FORMAT_YCbCr_420_SP	= 0x19,
+};
+
+enum {
+	GRALLOC_USAGE_OVERLAY_BUFFER	= 0x01000000,
+	GRALLOC_USAGE_VIDEO_BUFFER	= 0x02000000,
+	GRALLOC_USAGE_CAMERA_BUFFER	= 0x04000000,
+};
+
 struct private_handle_t;
 
 struct private_module_t
