@@ -12,7 +12,7 @@ include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_SRC_FILES := gps_shim.cpp
-LOCAL_SHARED_LIBRARIES := libbinder libgui
+LOCAL_SHARED_LIBRARIES := libbinder libgui libsensor
 LOCAL_MODULE := libgps_shim
 LOCAL_MODULE_TAGS := optional
 LOCAL_PROPRIETARY_MODULE := true
