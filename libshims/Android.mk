@@ -3,7 +3,6 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 LOCAL_SRC_FILES := ril_shim.cpp
 LOCAL_SHARED_LIBRARIES := libbinder liblog
-LOCAL_CPPFLAGS := -fexceptions
 LOCAL_MODULE := libril_shim
 LOCAL_MODULE_TAGS := optional
 LOCAL_PROPRIETARY_MODULE := true
