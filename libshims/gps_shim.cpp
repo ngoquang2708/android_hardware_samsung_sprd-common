@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-#include <stdlib.h>
-#include <malloc.h>
-
 extern "C" int _ZN7android13SensorManager5sLockE;
 extern "C" int _ZN7android9SingletonINS_13SensorManagerEE5sLockE = _ZN7android13SensorManager5sLockE;
 
@@ -43,7 +40,7 @@ extern "C" int _ZNK7android13SensorManager17assertStateLockedEv() {
     return _ZN7android13SensorManager17assertStateLockedEv();
 }
 
-extern "C" void *CRYPTO_malloc(int num, const char *file, int line);
-extern "C" void *CRYPTO_malloc(int num, const char *file, int line) {
-    return num <= 0 ? NULL : malloc(num);
+extern "C" void *malloc();
+extern "C" void *CRYPTO_malloc() {
+    return malloc();
 }
