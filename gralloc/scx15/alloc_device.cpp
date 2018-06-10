@@ -47,9 +47,8 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
-//#include <linux/ion.h>
-#include "usr/include/linux/ion.h"
-#include "ion_sprd.h"
+#include <linux/ion.h>
+#include <video/ion_sprd.h>
 #define ION_DEVICE "/dev/ion"
 
 

@@ -49,7 +49,8 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
-#include "sprd_fb.h"
+#include <video/sprd_fb.h>
+
 #include "gralloc_priv.h"
 
 

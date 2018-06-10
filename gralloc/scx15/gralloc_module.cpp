@@ -25,9 +25,8 @@
 #include <hardware/hardware.h>
 #include <hardware/gralloc.h>
 
-//#include <linux/ion.h>
-#include "usr/include/linux/ion.h"
-#include "ion_sprd.h"
+#include <linux/ion.h>
+#include <video/ion_sprd.h>
 
 #include "gralloc_priv.h"
 #include "alloc_device.h"
@@ -436,8 +435,8 @@ int gralloc_perform(struct gralloc_module_t const* module,
 	int res = -EINVAL;
 	va_list args;
 	va_start(args, operation);
-#if GRALLOC_ARM_UMP_MODULE
 	switch (operation) {
+#if GRALLOC_ARM_UMP_MODULE
 		case GRALLOC_MODULE_PERFORM_CREATE_HANDLE_FROM_BUFFER:
 		{
 			int fd = va_arg(args, int);
@@ -547,8 +546,8 @@ int gralloc_perform(struct gralloc_module_t const* module,
 			}
 			break;
 		}
+#endif // GRALLOC_ARM_UMP_MODULE
 	}
-#endif
 	va_end(args);
 	return res;
 }

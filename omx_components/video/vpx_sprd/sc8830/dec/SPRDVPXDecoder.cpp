@@ -29,11 +29,11 @@
 
 #include "gralloc_priv.h"
 #include "vpx_dec_api.h"
+
 #include <dlfcn.h>
-#include "ion_sprd.h"
+#include <video/ion_sprd.h>
 
-//#define VIDEODEC_CURRENT_OPT  /*only open for SAMSUNG currently*/
-
+#define VIDEODEC_CURRENT_OPT
 
 namespace android {
 

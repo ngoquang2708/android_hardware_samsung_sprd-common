@@ -25,6 +25,8 @@
 #include <media/stagefright/CameraSource.h>
 #include <media/stagefright/SurfaceUtils.h>
 
+#include "gralloc_priv.h"
+
 namespace android
 {
 

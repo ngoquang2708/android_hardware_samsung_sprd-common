@@ -54,7 +54,8 @@
 #include <utils/threads.h>
 #endif
 
-#include "sprd_fb.h"
+#include <video/sprd_fb.h>
+
 #include "gralloc_priv.h"
 #include "dump.h"
 
