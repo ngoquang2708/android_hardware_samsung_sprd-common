@@ -148,12 +148,17 @@ LOCAL int _Sensor_Device_PowerDown(BOOLEAN power_level)
 {
 	int ret = SENSOR_SUCCESS;
 	SENSOR_DRV_CHECK_ZERO(s_p_sensor_cxt);
+	struct {
+		uint32_t _power_level;
+		uint32_t _sensor_id;
+	} param = { power_level, Sensor_GetCurId() };
 
-	ret = xioctl(s_p_sensor_cxt->fd_sensor, SENSOR_IO_PD, &power_level);
+	ret = xioctl(s_p_sensor_cxt->fd_sensor, SENSOR_IO_PD, &param);
 
 	if (0 != ret)
 	{
-		CMR_LOGE("_Sensor_Device_PowerDown failed,  power_level = %d, ret=%d \n", power_level, ret);
+		CMR_LOGE("_Sensor_Device_PowerDown failed: sensor_id=%d power_level=%d ret=%d\n",
+				param._sensor_id, param._power_level, ret);
 		ret = -1;
 	}
 
@@ -195,11 +200,16 @@ LOCAL int _Sensor_Device_SetVoltageDVDD(uint32_t vdd_value)
 {
 	int ret = SENSOR_SUCCESS;
 	SENSOR_DRV_CHECK_ZERO(s_p_sensor_cxt);
+	struct {
+		uint32_t _vdd_value;
+		uint32_t _sensor_id;
+	} param = { vdd_value, Sensor_GetCurId() };
 
-	ret = xioctl(s_p_sensor_cxt->fd_sensor, SENSOR_IO_SET_DVDD, &vdd_value);
+	ret = xioctl(s_p_sensor_cxt->fd_sensor, SENSOR_IO_SET_DVDD, &param);
 	if (0 != ret)
 	{
-		CMR_LOGE("_Sensor_Device_SetVoltageDVDD failed,  vdd_value = %d, ret=%d \n", vdd_value, ret);
+		CMR_LOGE("_Sensor_Device_SetVoltageDVDD failed: sensor_id=%d vdd_value=%d ret=%d\n",
+				param._sensor_id, param._vdd_value, ret);
 		ret = -1;
 	}
 
@@ -316,11 +326,17 @@ LOCAL int _Sensor_Device_ResetLevel(uint32_t level)
 {
 	int ret = SENSOR_SUCCESS;
 	SENSOR_DRV_CHECK_ZERO(s_p_sensor_cxt);
+	struct {
+		uint32_t _level;
+		uint32_t _sensor_id;
+	} param = { level, Sensor_GetCurId() };
 
-	ret = xioctl(s_p_sensor_cxt->fd_sensor, SENSOR_IO_RST_LEVEL, &level);
+
+	ret = xioctl(s_p_sensor_cxt->fd_sensor, SENSOR_IO_RST_LEVEL, &param);
 	if (0 != ret)
 	{
-		CMR_LOGE("_Sensor_Device_Reset failed,  level = %d, ret=%d \n", level, ret);
+		CMR_LOGE("_Sensor_Device_Reset failed: sensor_id=%d level=%d ret=%d\n",
+				param._sensor_id, param._level, ret);
 		ret = -1;
 	}
 
