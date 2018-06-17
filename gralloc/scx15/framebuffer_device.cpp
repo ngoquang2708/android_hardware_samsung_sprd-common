@@ -48,10 +48,6 @@
 #define NUM_BUFFERS NUM_FB_BUFFERS
 //#define DEBUG_FB_POST
 
-#ifdef DUMP_FB
-extern void dump_fb(void* addr, struct fb_var_screeninfo * info , int format);
-#endif
-
 static int swapInterval = 1;
 
 enum {
@@ -282,10 +278,6 @@ static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
         int interrupt;
         m->info.activate = FB_ACTIVATE_VBL;
         m->info.yoffset = offset / m->finfo.line_length;
-
-#ifdef DUMP_FB
-        dump_fb((void*)(hnd->base), &m->info, m->fbFormat);
-#endif
 
 #ifdef SPRD_DITHER_ENABLE
         struct dither_info *dither = (struct dither_info *)dev->reserved[6];
