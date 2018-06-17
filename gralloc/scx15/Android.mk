@@ -74,7 +74,6 @@ LOCAL_SRC_FILES := \
 	framebuffer_device.cpp \
 	dump_bmp.cpp \
 
-#LOCAL_CFLAGS+= -DMALI_VSYNC_EVENT_REPORT_ENABLE
 include $(BUILD_SHARED_LIBRARY)
 
 endif

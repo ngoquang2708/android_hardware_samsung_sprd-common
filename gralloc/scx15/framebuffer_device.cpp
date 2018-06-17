@@ -34,10 +34,6 @@
 /* @} */
 #include <GLES/gl.h>
 
-#ifdef MALI_VSYNC_EVENT_REPORT_ENABLE
-#include "gralloc_vsync_report.h"
-#endif
-
 #include "alloc_device.h"
 #include "gralloc_priv.h"
 #include "gralloc_helper.h"
@@ -359,23 +355,14 @@ static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
 			}
 
 			// wait for VSYNC
-#ifdef MALI_VSYNC_EVENT_REPORT_ENABLE
-			gralloc_mali_vsync_report(MALI_VSYNC_EVENT_BEGIN_WAIT);
-#endif
 			int crtc = 0;
 
 			if (ioctl(m->framebuffer->fd, FBIO_WAITFORVSYNC, &crtc) < 0)
 			{
 				AERR("FBIO_WAITFORVSYNC failed for fd: %d", m->framebuffer->fd);
-#ifdef MALI_VSYNC_EVENT_REPORT_ENABLE
-				gralloc_mali_vsync_report(MALI_VSYNC_EVENT_END_WAIT);
-#endif
 				return 0;
 			}
 
-#ifdef MALI_VSYNC_EVENT_REPORT_ENABLE
-			gralloc_mali_vsync_report(MALI_VSYNC_EVENT_END_WAIT);
-#endif
 			// disable VSYNC
 			interrupt = 0;
 
@@ -388,10 +375,6 @@ static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
 
 #else
 		/*Standard Android way*/
-#ifdef MALI_VSYNC_EVENT_REPORT_ENABLE
-		gralloc_mali_vsync_report(MALI_VSYNC_EVENT_BEGIN_WAIT);
-#endif
-
 #ifdef FB_FORMAT_SWITCH
 		if(dev->format==HAL_PIXEL_FORMAT_RGB_565){
 			m->info.bits_per_pixel = 16;
@@ -419,16 +402,10 @@ static int fb_post(struct framebuffer_device_t* dev, buffer_handle_t buffer)
 		if (ioctl(m->framebuffer->fd, FBIOPUT_VSCREENINFO, &m->info) == -1) 
 		{
 			AERR("FBIOPUT_VSCREENINFO failed for fd: %d", m->framebuffer->fd);
-#ifdef MALI_VSYNC_EVENT_REPORT_ENABLE
-			gralloc_mali_vsync_report(MALI_VSYNC_EVENT_END_WAIT);
-#endif
 			m->base.unlock(&m->base, buffer);
 			return -errno;
 		}
 
-#ifdef MALI_VSYNC_EVENT_REPORT_ENABLE
-		gralloc_mali_vsync_report(MALI_VSYNC_EVENT_END_WAIT);
-#endif
 #endif
 
 		m->currentBuffer = buffer;

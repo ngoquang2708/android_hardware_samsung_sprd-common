@@ -32,18 +32,10 @@
 #include "gralloc_helper.h"
 #include "framebuffer_device.h"
 
-#if GRALLOC_ARM_UMP_MODULE
-#include <ump/ump.h>
-#include <ump/ump_ref_drv.h>
-#endif
-
-#if GRALLOC_ARM_DMA_BUF_MODULE
 #include <linux/ion.h>
 #include <ion/ion.h>
-#endif
 
 #include <sys/mman.h>
-//#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
@@ -51,199 +43,10 @@
 #include <video/ion_sprd.h>
 #define ION_DEVICE "/dev/ion"
 
-
 #define GRALLOC_ALIGN( value, base ) (((value) + ((base) - 1)) & ~((base) - 1))
-
-
-#if GRALLOC_SIMULATE_FAILURES
-#include <cutils/properties.h>
-
-/* system property keys for controlling simulated UMP allocation failures */
-#define PROP_MALI_TEST_GRALLOC_FAIL_FIRST     "mali.test.gralloc.fail_first"
-#define PROP_MALI_TEST_GRALLOC_FAIL_INTERVAL  "mali.test.gralloc.fail_interval"
-
-static int __ump_alloc_should_fail()
-{
-
-	static unsigned int call_count	= 0;
-	unsigned int        first_fail	= 0;
-	int                 fail_period = 0;
-	int                 fail        = 0;
-
-	++call_count;
-
-	/* read the system properties that control failure simulation */
-	{
-		char prop_value[PROPERTY_VALUE_MAX];
-
-		if (property_get(PROP_MALI_TEST_GRALLOC_FAIL_FIRST, prop_value, "0") > 0)
-		{
-			sscanf(prop_value, "%u", &first_fail);
-		}
-
-		if (property_get(PROP_MALI_TEST_GRALLOC_FAIL_INTERVAL, prop_value, "0") > 0)
-		{
-			sscanf(prop_value, "%u", &fail_period);
-		}
-	}
-
-	/* failure simulation is enabled by setting the first_fail property to non-zero */
-	if (first_fail > 0)
-	{
-		LOGI("iteration %u (fail=%u, period=%u)\n", call_count, first_fail, fail_period);
-
-		fail =	(call_count == first_fail) ||
-				(call_count > first_fail && fail_period > 0 && 0 == (call_count - first_fail) % fail_period);
-
-		if (fail)
-		{
-			AERR("failed ump_ref_drv_allocate on iteration #%d\n", call_count);
-		}
-	}
-	return fail;
-}
-#endif
-
-#if SPRD_ION
-int open_ion_device(private_module_t* m)
-{
-	int res=-1;
-	pthread_mutex_lock(&m->fd_lock);
-	if(m->mIonFd < 0)
-	{
-		m->mIonFd = open(ION_DEVICE, O_RDONLY|O_SYNC);
-	}
-	if(m->mIonFd >= 0)
-	{
-		res=0;
-	}
-	pthread_mutex_unlock(&m->fd_lock);
-	return res;
-}
-
-void close_ion_device(private_module_t* m)
-{
-	pthread_mutex_lock(&m->fd_lock);
-	if(m->mIonFd >= 0)
-	{
-		close(m->mIonFd);
-	}
-	m->mIonFd = -1;
-	pthread_mutex_unlock(&m->fd_lock);
-}
-
-static int gralloc_alloc_ionbuffer_locked(alloc_device_t* dev, size_t size, int usage, buffer_handle_t* pHandle,  int is_overlay)
-{
-	private_module_t* m = reinterpret_cast<private_module_t*>(dev->common.module);
-
-	if(open_ion_device(m))
-	{
-       	ALOGE("%s: Failed to open ion device - %s",  __FUNCTION__, strerror(errno));
-       	return -ENOMEM;
-       }
-
-	int is_cached = 0;
-	int ion_fd = m->mIonFd;
-	uint32_t uread = usage & GRALLOC_USAGE_SW_READ_MASK;
-	uint32_t uwrite = usage & GRALLOC_USAGE_SW_WRITE_MASK;
-	if (uread == GRALLOC_USAGE_SW_READ_OFTEN || uwrite == GRALLOC_USAGE_SW_WRITE_OFTEN) {
-		is_cached = 1;
-		ion_fd = open(ION_DEVICE, O_RDONLY);
-		if(ion_fd < 0) {
-			ALOGE("open cacheable ion device fail");
-			return  -ENOMEM;
-		}
-	}
-
-	int err = 0;
-	void *base = 0;
-       struct ion_fd_data fd_data;
-       struct ion_handle_data handle_data;
-       struct ion_allocation_data ionAllocData;
-       ionAllocData.len = round_up_to_page_size(size);
-       ionAllocData.align = PAGE_SIZE;
-#if (ION_DRIVER_VERSION == 1)
-       if (is_overlay) {
-	   	ionAllocData.heap_mask = (1 <<( ION_HEAP_TYPE_CARVEOUT+1));
-       } else {
-       		ionAllocData.heap_mask = ION_HEAP_CARVEOUT_MASK;
-       }
-	ionAllocData.flags = 0;
-#else
-       if (is_overlay) {
-	   	ionAllocData.flags = (1 <<( ION_HEAP_TYPE_CARVEOUT+1));
-       } else {
-       		ionAllocData.flags = ION_HEAP_CARVEOUT_MASK;
-       }	
-#endif
-    	err = ioctl(ion_fd, ION_IOC_ALLOC, &ionAllocData);
-    	if(err)
-	{
-		if(is_overlay)
-			ALOGI("overlay is not opened or not enough overlay ion memory, result is:%d" , err);
-		else
-			ALOGE("ION_IOC_ALLOC fail");
-		if(is_cached) close(ion_fd);
-		return -ENOMEM;
-    	}
-
-    	fd_data.handle = ionAllocData.handle;
-       handle_data.handle = ionAllocData.handle;
-
-       err = ioctl(ion_fd, ION_IOC_SHARE, &fd_data);
-       if(err)
-	{
-		ALOGE("ION_IOC_SHARE fail");
-		if(is_cached) close(ion_fd);
-		return -ENOMEM;
-       }
-
-       base = mmap(0, ionAllocData.len, PROT_READ|PROT_WRITE,
-                                MAP_SHARED, fd_data.fd, 0);
-
-	if(base == MAP_FAILED)
-	{
-		ALOGE("%s: Failed to map the allocated memory: %s",  __FUNCTION__, strerror(errno));
-		ioctl(ion_fd, ION_IOC_FREE, &handle_data);
-		if(is_cached) close(ion_fd);
-		return -ENOMEM;
-       }
-
-	gralloc_module_t *module = &(m->base);
-
-	err = module->perform(module,
-				GRALLOC_MODULE_PERFORM_CREATE_HANDLE_FROM_BUFFER,
-				fd_data.fd, ionAllocData.len,
-				0,base,
-				pHandle);
-	if(err)
-	{
-		ALOGE("perform fail");
-		munmap(base, ionAllocData.len);
-		if(is_cached) close(ion_fd);
-		return -ENOMEM;
-	}
-
-	ioctl(ion_fd, ION_IOC_FREE, &handle_data);
-
-	if(is_cached) close(ion_fd);
-
-	return 0;
-}
-
-static int gralloc_alloc_ionbuffer(alloc_device_t* dev, size_t size, int usage, buffer_handle_t* pHandle, int is_overlay)
-{
-	private_module_t* m = reinterpret_cast<private_module_t*>(dev->common.module);
-	pthread_mutex_lock(&m->lock);
-	int err = gralloc_alloc_ionbuffer_locked(dev, size, usage, pHandle, is_overlay);
-	pthread_mutex_unlock(&m->lock);
-	return err;
-}
-#endif
 
 static int gralloc_alloc_buffer(alloc_device_t* dev, size_t size, int usage, buffer_handle_t* pHandle)
 {
-    #if GRALLOC_ARM_DMA_BUF_MODULE
     {
         private_module_t* m = reinterpret_cast<private_module_t*>(dev->common.module);
         struct ion_handle *ion_hnd;
@@ -323,80 +126,6 @@ static int gralloc_alloc_buffer(alloc_device_t* dev, size_t size, int usage, buf
             return -1;
         }
     }
-    #endif
-
-#if GRALLOC_ARM_UMP_MODULE
-	{
-		ump_handle ump_mem_handle;
-		void *cpu_ptr;
-		ump_secure_id ump_id;
-		ump_alloc_constraints constraints;
-
-		size = round_up_to_page_size(size);
-
-		if( (usage&GRALLOC_USAGE_SW_READ_MASK) == GRALLOC_USAGE_SW_READ_OFTEN )
-		{
-			constraints =  UMP_REF_DRV_CONSTRAINT_USE_CACHE;
-		}
-		else
-		{
-			constraints = UMP_REF_DRV_CONSTRAINT_NONE;
-		}
-
-#ifdef GRALLOC_SIMULATE_FAILURES
-		/* if the failure condition matches, fail this iteration */
-		if (__ump_alloc_should_fail())
-		{
-			ump_mem_handle = UMP_INVALID_MEMORY_HANDLE;
-		}
-		else
-#endif
-		{
-			ump_mem_handle = ump_ref_drv_allocate(size, constraints);
-
-			if (UMP_INVALID_MEMORY_HANDLE != ump_mem_handle)
-			{
-				cpu_ptr = ump_mapped_pointer_get(ump_mem_handle);
-				if (NULL != cpu_ptr)
-				{
-					ump_id = ump_secure_id_get(ump_mem_handle);
-					if (UMP_INVALID_SECURE_ID != ump_id)
-					{
-						private_handle_t* hnd = new private_handle_t(private_handle_t::PRIV_FLAGS_USES_UMP, usage, size, (int)cpu_ptr,
-																	 private_handle_t::LOCK_STATE_MAPPED, ump_id, ump_mem_handle);
-						if (NULL != hnd)
-						{
-							*pHandle = hnd;
-							return 0;
-						}
-						else
-						{
-							AERR( "gralloc_alloc_buffer() failed to allocate handle. ump_handle = %p, ump_id = %d", ump_mem_handle, ump_id );
-						}
-					}
-					else
-					{
-						AERR( "gralloc_alloc_buffer() failed to retrieve valid secure id. ump_handle = %p", ump_mem_handle );
-					}
-			
-					ump_mapped_pointer_release(ump_mem_handle);
-				}
-				else
-				{
-					AERR( "gralloc_alloc_buffer() failed to map UMP memory. ump_handle = %p", ump_mem_handle );
-				}
-
-				ump_reference_release(ump_mem_handle);
-			}
-			else
-			{
-				AERR( "gralloc_alloc_buffer() failed to allocate UMP memory. size:%d constraints: %d", size, constraints );
-			}
-		}
-		return -1;
-	}
-#endif
-
 }
 
 static int gralloc_alloc_framebuffer_locked(alloc_device_t* dev, size_t size, int usage, buffer_handle_t* pHandle)
@@ -448,20 +177,6 @@ static int gralloc_alloc_framebuffer_locked(alloc_device_t* dev, size_t size, in
 	// The entire framebuffer memory is already mapped, now create a buffer object for parts of this memory
 	private_handle_t* hnd = new private_handle_t(private_handle_t::PRIV_FLAGS_FRAMEBUFFER, usage, size, vaddr,
 												 0, dup(m->framebuffer->fd), vaddr - m->framebuffer->base);
-#if GRALLOC_ARM_UMP_MODULE
-	hnd->ump_id = m->framebuffer->ump_id;
-	/* create a backing ump memory handle if the framebuffer is exposed as a secure ID */
-	if ( (int)UMP_INVALID_SECURE_ID != hnd->ump_id )
-	{
-		hnd->ump_mem_handle = (int)ump_handle_create_from_secure_id( hnd->ump_id );
-		if ( (int)UMP_INVALID_MEMORY_HANDLE == hnd->ump_mem_handle )
-		{
-			AINF("warning: unable to create UMP handle from secure ID %i\n", hnd->ump_id);
-		}
-	}
-#endif
-
-#if GRALLOC_ARM_DMA_BUF_MODULE
 	{
 	#ifdef FBIOGET_DMABUF
 		struct fb_dmabuf_export fb_dma_buf;
@@ -473,7 +188,6 @@ static int gralloc_alloc_framebuffer_locked(alloc_device_t* dev, size_t size, in
 		}
 	#endif
 	}
-#endif
 
 	*pHandle = hnd;
 
@@ -549,57 +263,12 @@ static int alloc_device_alloc(alloc_device_t* dev, int w, int h, int format, int
 		size = bpr * h;
 		stride = bpr / bpp;
 	}
-#if SPRD_ION
-	int preferIon = 0;
-	private_module_t* m = reinterpret_cast<private_module_t*>(dev->common.module);
-	if ((format == HAL_PIXEL_FORMAT_RGBA_8888)
-		&& (((stride == m->info.xres) && (h == m->info.yres)) ||((h == m->info.xres) && (stride == m->info.yres)) )
-		&& !(usage & GRALLOC_USAGE_HW_FB)) {
-			//usage |= GRALLOC_USAGE_PRIVATE_0;
-			//preferIon = 1;
-			usage |= GRALLOC_USAGE_OVERLAY_BUFFER;
-	}
-#endif
 	int err;
-	#ifndef MALI_600
-#if SPRD_ION
-	if(usage & (GRALLOC_USAGE_PRIVATE_0 | GRALLOC_USAGE_PRIVATE_1))
-	{
-		 err = gralloc_alloc_ionbuffer(dev, size, usage, pHandle, preferIon);
-		 if(err>=0){
-			const native_handle_t *p_nativeh  = *pHandle;
-			private_handle_t *hnd = (private_handle_t*)p_nativeh;
-			hnd->format = format;
-			hnd->width = stride;
-			hnd->height = h;
-			if (usage &  GRALLOC_USAGE_PRIVATE_1) {
-				hnd->flags |= private_handle_t::PRIV_FLAGS_NOT_OVERLAY;
-			}
-#ifdef DRM_SPECIAL_PROCESS
-                        if (!(usage & GRALLOC_USAGE_PROTECTED)) {
-                                hnd->flags |= private_handle_t::PRIV_FLAGS_NOT_OVERLAY;
-                        }
-#endif
-			if(preferIon)
-			{
-				m->mIonBufNum++;
-				ALOGI("================allocat  ion memory for rgba xres*yres = %d*%d fd = %d:%d", m->info.xres,  m->info.yres, hnd->fd, m->mIonBufNum);
-			}
-		} else {
-			if(preferIon) {
-				ALOGI("================allocat  ion memory for rgba reserved buffer size too small,need to alloc normal buffer");
-				goto AllocNormalBuffer;
-			}
-		}
-	}
-	else
-#endif
 	if (usage & GRALLOC_USAGE_HW_FB)
 	{
 		err = gralloc_alloc_framebuffer(dev, size, usage, pHandle);
 	}
 	else
-	#endif
 	{
 AllocNormalBuffer:
 		err = gralloc_alloc_buffer(dev, size, usage, pHandle);
@@ -671,38 +340,6 @@ static int alloc_device_free(alloc_device_t* dev, buffer_handle_t handle)
 				// we can't deallocate the memory in case of UNMAP failure
 				// because it would give that process access to someone else's
 				// surfaces, which would be a security breach.
-#if SPRD_ION
-	if (hnd->flags & private_handle_t::PRIV_FLAGS_USES_PHY)
-	{
-		private_module_t* m = reinterpret_cast<private_module_t*>(dev->common.module);
-		gralloc_module_t *module = &(m->base);
-		module->perform(module,
-					GRALLOC_MODULE_PERFORM_FREE_HANDLE,
-					&handle);
-		munmap((void *)hnd->base, hnd->size);
-		ALOGI("FREE hnd=%p,fd=%d,offset=0x%x,size=%d,base=%x,phys_addr=0x%x",hnd,hnd->fd,hnd->offset,hnd->size,hnd->base,hnd->phyaddr);
-		close(hnd->fd);
-	       close_ion_device(m);
-		if(hnd->format == HAL_PIXEL_FORMAT_RGBA_8888)
-		{
-			m->mIonBufNum--;
-			ALOGI("================ free ion memory fd=%d:%d", hnd->fd, m->mIonBufNum);
-		}
-		/*
-    		struct ion_fd_data fd_data;
-    		fd_data.fd = hnd->fd;
-    		int err = ioctl(m->mIonFd, ION_IOC_IMPORT, &fd_data);
-		if(err) {
-			ALOGE("ION_IOC_IMPORT fail");
-		}
-
-       	struct ion_handle_data handle_data;
-		handle_data.handle = fd_data.handle;
-		ioctl(m->mIonFd, ION_IOC_FREE, &handle_data);
-		*/
-	}
-	else
-#endif
 	if (hnd->flags & private_handle_t::PRIV_FLAGS_FRAMEBUFFER)
 	{
 		// free this buffer
@@ -712,29 +349,13 @@ static int alloc_device_free(alloc_device_t* dev, buffer_handle_t handle)
 		m->bufferMask &= ~(1<<index);
 		close(hnd->fd);
 
-#if GRALLOC_ARM_UMP_MODULE
-		if ( (int)UMP_INVALID_MEMORY_HANDLE != hnd->ump_mem_handle )
-		{
-			ump_reference_release((ump_handle)hnd->ump_mem_handle);
-		}
-#endif
 	}
 	else if (hnd->flags & private_handle_t::PRIV_FLAGS_USES_UMP)
 	{
-#if GRALLOC_ARM_UMP_MODULE
-		/* Buffer might be unregistered so we need to check for invalid ump handle*/
-		if ( (int)UMP_INVALID_MEMORY_HANDLE != hnd->ump_mem_handle )
-		{
-			ump_mapped_pointer_release((ump_handle)hnd->ump_mem_handle);
-			ump_reference_release((ump_handle)hnd->ump_mem_handle);
-		}
-#else
 		AERR( "Can't free ump memory for handle:0x%x. Not supported.", (unsigned int)hnd );
-#endif
 	}
 	else if ( hnd->flags & private_handle_t::PRIV_FLAGS_USES_ION )
 	{
-#if GRALLOC_ARM_DMA_BUF_MODULE
 		private_module_t* m = reinterpret_cast<private_module_t*>(dev->common.module);
 		/* Buffer might be unregistered so we need to check for invalid ump handle*/
 		if ( 0 != hnd->base )
@@ -745,9 +366,6 @@ static int alloc_device_free(alloc_device_t* dev, buffer_handle_t handle)
 		close( hnd->share_fd );
 		if ( 0 != ion_free( m->ion_client, hnd->ion_hnd ) ) AERR( "Failed to ion_free( ion_client: %d ion_hnd: %p )", m->ion_client, hnd->ion_hnd );
 		memset( (void*)hnd, 0, sizeof( *hnd ) );
-#else 
-		AERR( "Can't free dma_buf memory for handle:0x%x. Not supported.", (unsigned int)hnd );
-#endif
 		
 	}
 
@@ -762,15 +380,10 @@ static int alloc_device_close(struct hw_device_t *device)
 	alloc_device_t* dev = reinterpret_cast<alloc_device_t*>(device);
 	if (dev)
 	{
-#if GRALLOC_ARM_DMA_BUF_MODULE
 		private_module_t *m = reinterpret_cast<private_module_t*>(device);
 		if ( 0 != ion_close(m->ion_client) ) AERR( "Failed to close ion_client: %d", m->ion_client );
 		close(m->ion_client);
-#endif
 		delete dev;
-#if GRALLOC_ARM_UMP_MODULE
-		ump_close(); // Our UMP memory refs will be released automatically here...
-#endif
 	}
 	return 0;
 }
@@ -785,16 +398,6 @@ int alloc_device_open(hw_module_t const* module, const char* name, hw_device_t**
 		return -1;
 	}
 
-#if GRALLOC_ARM_UMP_MODULE
-	ump_result ump_res = ump_open();
-	if (UMP_OK != ump_res)
-	{
-		AERR( "UMP open failed with %d", ump_res );
-		delete dev;
-		return -1;
-	}
-#endif
-
 	/* initialize our state here */
 	memset(dev, 0, sizeof(*dev));
 
@@ -806,7 +409,6 @@ int alloc_device_open(hw_module_t const* module, const char* name, hw_device_t**
 	dev->alloc = alloc_device_alloc;
 	dev->free = alloc_device_free;
 
-#if GRALLOC_ARM_DMA_BUF_MODULE
 	private_module_t *m = reinterpret_cast<private_module_t *>(dev->common.module);
 	m->ion_client = ion_open();
 	if ( m->ion_client < 0 )
@@ -815,7 +417,6 @@ int alloc_device_open(hw_module_t const* module, const char* name, hw_device_t**
 		delete dev;
 		return -1;
 	}
-#endif
 	
 	*device = &dev->common;
 

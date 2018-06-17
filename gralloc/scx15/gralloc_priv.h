@@ -31,11 +31,6 @@
 #include <alloc_device.h>
 #include <utils/Log.h>
 
-#ifdef MALI_600
-#define GRALLOC_ARM_UMP_MODULE 0
-#define GRALLOC_ARM_DMA_BUF_MODULE 1
-#else
-
 /* NOTE:
  * If your framebuffer device driver is integrated with UMP, you will have to
  * change this IOCTL definition to reflect your integration with the framebuffer
@@ -44,9 +39,6 @@
  */
 
 /*#define IOCTL_GET_FB_UMP_SECURE_ID    _IOR('F', 311, unsigned int)*/
-#define GRALLOC_ARM_UMP_MODULE 0
-#define GRALLOC_ARM_DMA_BUF_MODULE 1
-#define SPRD_ION 0
 
 /* NOTE:
  * If your framebuffer device driver is integrated with dma_buf, you will have to
@@ -55,26 +47,17 @@
  * Expected return value is a structure filled with a file descriptor
  * backing your framebuffer device memory.
  */
-#if GRALLOC_ARM_DMA_BUF_MODULE
 struct fb_dmabuf_export
 {
 	__u32 fd;
 	__u32 flags;
 };
 /*#define FBIOGET_DMABUF    _IOR('F', 0x21, struct fb_dmabuf_export)*/
-#endif /* GRALLOC_ARM_DMA_BUF_MODULE */
-
-
-#endif
 
 #ifdef USE_3_FRAMEBUFFER
 #define NUM_FB_BUFFERS 3
 #else
 #define NUM_FB_BUFFERS 2
-#endif
-
-#if GRALLOC_ARM_UMP_MODULE
-#include <ump/ump.h>
 #endif
 
 typedef enum
@@ -112,10 +95,6 @@ struct private_module_t
 	pthread_mutex_t fd_lock;
 	buffer_handle_t currentBuffer;
 	int ion_client;
-#if SPRD_ION
-	int mIonFd;
-	int mIonBufNum;
-#endif
 	struct fb_var_screeninfo info;
 	struct fb_fix_screeninfo finfo;
 	float xdpi;
@@ -159,15 +138,9 @@ struct private_handle_t
 		LOCK_STATE_MAPPED    =   1 << 30,
 		LOCK_STATE_READ_MASK =   0x3FFFFFFF
 	};
-#if SPRD_ION
-	//fds
-	int 	fd;
-#endif
 	// ints
-#if GRALLOC_ARM_DMA_BUF_MODULE
 	/*shared file descriptor for dma_buf sharing*/
 	int     share_fd;
-#endif
 	int     magic;
 	int     flags;
 	int     usage;
@@ -183,14 +156,7 @@ struct private_handle_t
 
 	mali_gralloc_yuv_info yuv_info;
 
-	// Following members are for UMP memory only
-#if GRALLOC_ARM_UMP_MODULE
-	int     ump_id;
-	int     ump_mem_handle;
-#define GRALLOC_ARM_UMP_NUM_INTS 2
-#else
 #define GRALLOC_ARM_UMP_NUM_INTS 0
-#endif
 
 	// Following members is for framebuffer only
 	int     fd;
@@ -198,29 +164,12 @@ struct private_handle_t
 
 	int     phyaddr;
 
-#if SPRD_ION
-	int     resv0;
-	int     resv1;
-#endif
-
-#if SPRD_ION
-#define SPRD_ION_NUM_INTS 2
-#else
 #define SPRD_ION_NUM_INTS 1
-#endif
-#if GRALLOC_ARM_DMA_BUF_MODULE
 	int     ion_client;
 	struct ion_handle *ion_hnd;
 #define GRALLOC_ARM_DMA_BUF_NUM_INTS 3 
-#else
-#define GRALLOC_ARM_DMA_BUF_NUM_INTS 0
-#endif
 
-#if GRALLOC_ARM_DMA_BUF_MODULE
 #define GRALLOC_ARM_NUM_FDS 1
-#else
-#define GRALLOC_ARM_NUM_FDS 0
-#endif
 
 #ifdef __cplusplus
 	/*
@@ -233,41 +182,6 @@ struct private_handle_t
 	static const int sNumFds = GRALLOC_ARM_NUM_FDS;
 	static const int sMagic = 0x3141592;
 
-#if GRALLOC_ARM_UMP_MODULE
-	private_handle_t(int flags, int usage, int size, int base, int lock_state, ump_secure_id secure_id, ump_handle handle, int offset = 0, int fd = 0):
-#if GRALLOC_ARM_DMA_BUF_MODULE
-		share_fd(-1),
-#endif
-		magic(sMagic),
-		flags(flags),
-		usage(usage),
-		size(size),
-		width(0),
-		height(0),
-		format(0),
-		stride(0),
-		base(base),
-		lockState(lock_state),
-		writeOwner(0),
-		pid(getpid()),
-		yuv_info(MALI_YUV_NO_INFO),
-		ump_id((int)secure_id),
-		ump_mem_handle((int)handle),
-		fd(fd),
-		offset(offset)
-#if GRALLOC_ARM_DMA_BUF_MODULE
-		,ion_client(-1),
-		ion_hnd(NULL)
-#endif
-
-	{
-		version = sizeof(native_handle);
-		numFds = sNumFds;
-		numInts = sNumInts;
-	}
-#endif
-
-#if GRALLOC_ARM_DMA_BUF_MODULE
 	private_handle_t(int flags, int usage, int size, int base, int lock_state):
 		share_fd(-1),
 		magic(sMagic),
@@ -283,10 +197,6 @@ struct private_handle_t
 		writeOwner(0),
 		pid(getpid()),
 		yuv_info(MALI_YUV_NO_INFO),
-#if GRALLOC_ARM_UMP_MODULE
-		ump_id((int)UMP_INVALID_SECURE_ID),
-		ump_mem_handle((int)UMP_INVALID_MEMORY_HANDLE),
-#endif
 		fd(0),
 		offset(0),
 		ion_client(-1),
@@ -298,12 +208,9 @@ struct private_handle_t
 		numInts = sNumInts;
 	}
 
-#endif
 
 	private_handle_t(int flags, int usage, int size, int base, int lock_state, int fb_file, int fb_offset):
-#if GRALLOC_ARM_DMA_BUF_MODULE
 		share_fd(-1),
-#endif
 		magic(sMagic),
 		flags(flags),
 		usage(usage),
@@ -317,17 +224,10 @@ struct private_handle_t
 		writeOwner(0),
 		pid(getpid()),
 		yuv_info(MALI_YUV_NO_INFO),
-#if GRALLOC_ARM_UMP_MODULE
-		ump_id((int)UMP_INVALID_SECURE_ID),
-		ump_mem_handle((int)UMP_INVALID_MEMORY_HANDLE),
-#endif
 		fd(fb_file),
 		offset(fb_offset)
-#if GRALLOC_ARM_DMA_BUF_MODULE
 		,ion_client(-1),
 		ion_hnd(NULL)
-#endif
-
 	{
 		version = sizeof(native_handle);
 		numFds = sNumFds;
