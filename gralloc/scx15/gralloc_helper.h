@@ -3,6 +3,8 @@
  *
  * Copyright (C) 2008 The Android Open Source Project
  *
+ * Copyright (C) 2018 The LineageOS Project
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +25,7 @@
 
 inline size_t round_up_to_page_size(size_t x)
 {
-	return (x + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
+    return (x + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
 }
 
 #endif /* GRALLOC_HELPER_H_ */

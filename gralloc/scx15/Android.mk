@@ -32,35 +32,27 @@ LOCAL_MODULE := gralloc.$(TARGET_BOARD_PLATFORM)
 
 LOCAL_MODULE_TAGS := optional
 
-SHARED_MEM_LIBS := \
-	libion_sprd \
-	libhardware
-
 LOCAL_SHARED_LIBRARIES := \
-	liblog \
-	libcutils \
-	libGLESv1_CM \
-	$(SHARED_MEM_LIBS) \
+    liblog \
+    libcutils \
+    libhardware \
+    libion_sprd \
+    libGLESv1_CM \
 
 LOCAL_C_INCLUDES := \
-	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/ \
+    $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/ \
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
-	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr \
+    $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr \
 
-LOCAL_EXPORT_C_INCLUDE_DIRS := \
-	$(LOCAL_PATH) \
-	$(LOCAL_C_INCLUDES) \
-
-LOCAL_CFLAGS := \
-	-DLOG_TAG=\"gralloc.$(TARGET_BOARD_PLATFORM)\" \
+LOCAL_CFLAGS := -DLOG_TAG=\"gralloc.$(TARGET_BOARD_PLATFORM)\"
 
 ifeq ($(strip $(USE_UI_OVERLAY)),true)
 LOCAL_CFLAGS += -DUSE_UI_OVERLAY
 endif
 
 ifneq ($(strip $(TARGET_BUILD_VARIANT)),user)
-LOCAL_CFLAGS += -DDUMP_FB
+#LOCAL_CFLAGS += -DDUMP_FB
 endif
 
 ifeq ($(USE_SPRD_DITHER),true)
@@ -69,10 +61,10 @@ LOCAL_SHARED_LIBRARIES += libdither
 endif
 
 LOCAL_SRC_FILES := \
-	gralloc_module.cpp \
-	alloc_device.cpp \
-	framebuffer_device.cpp \
-	dump_bmp.cpp \
+    gralloc_module.cpp \
+    alloc_device.cpp \
+    framebuffer_device.cpp \
+    dump_bmp.cpp \
 
 include $(BUILD_SHARED_LIBRARY)
 
