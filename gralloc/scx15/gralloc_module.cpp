@@ -38,9 +38,6 @@
 
 static pthread_mutex_t s_map_lock = PTHREAD_MUTEX_INITIALIZER;
 
-extern int open_ion_device(private_module_t* m);
-extern void close_ion_device(private_module_t* m);
-
 static int gralloc_device_open(const hw_module_t* module, const char* name, hw_device_t** device)
 {
     int status = -EINVAL;
@@ -153,7 +150,7 @@ static int gralloc_unregister_buffer(gralloc_module_t const *module, buffer_hand
         }
 
         hnd->base = 0;
-        hnd->lockState    = 0;
+        hnd->lockState = 0;
         hnd->writeOwner = 0;
         pthread_mutex_unlock(&s_map_lock);
     } else {

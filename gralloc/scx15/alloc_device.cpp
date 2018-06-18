@@ -73,14 +73,16 @@ static int gralloc_alloc_buffer(alloc_device_t* dev, size_t size, int usage, buf
     ret = ion_share(m->ion_client, ion_hnd, &shared_fd);
     if (ret != 0) {
         AERR("ion_share(%d) failed", m->ion_client);
-        if (0 != ion_free(m->ion_client, ion_hnd)) AERR("ion_free(%d) failed", m->ion_client);
+        if (0 != ion_free(m->ion_client, ion_hnd))
+            AERR("ion_free(%d) failed", m->ion_client);
         return -1;
     }
     cpu_ptr = (unsigned char*)mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, shared_fd, 0);
 
     if (MAP_FAILED == cpu_ptr) {
         AERR("ion_map(%d) failed", m->ion_client);
-        if (0 != ion_free(m->ion_client, ion_hnd)) AERR("ion_free(%d) failed", m->ion_client);
+        if (0 != ion_free(m->ion_client, ion_hnd))
+            AERR("ion_free(%d) failed", m->ion_client);
         close(shared_fd);
         return -1;
     }
