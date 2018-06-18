@@ -58,6 +58,7 @@ LOCAL_SRC_FILES := \
     gralloc_module.cpp \
     alloc_device.cpp \
     framebuffer_device.cpp \
+    mapper.cpp \
 
 include $(BUILD_SHARED_LIBRARY)
 
