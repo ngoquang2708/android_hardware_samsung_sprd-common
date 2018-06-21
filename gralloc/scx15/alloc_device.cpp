@@ -47,7 +47,7 @@
 static int gralloc_alloc_buffer(alloc_device_t* dev, size_t size, int usage, buffer_handle_t* pHandle) {
     private_module_t* m = reinterpret_cast<private_module_t*>(dev->common.module);
     struct ion_handle *ion_hnd;
-    unsigned char *cpu_ptr;
+    void *cpu_ptr;
     int shared_fd;
     int ret;
     int ion_heap_mask = 0;
@@ -77,12 +77,16 @@ static int gralloc_alloc_buffer(alloc_device_t* dev, size_t size, int usage, buf
             AERR("ion_free(%d) failed", m->ion_client);
         return -1;
     }
-    cpu_ptr = (unsigned char*)mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, shared_fd, 0);
+
+    // ion_hnd is no longer needed once we acquire shared_fd.
+    if (0 != ion_free(m->ion_client, ion_hnd))
+	    AWAR("ion_free( %d ) failed", m->ion_client);
+    ion_hnd = NULL;
+
+    cpu_ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, shared_fd, 0);
 
     if (MAP_FAILED == cpu_ptr) {
         AERR("ion_map(%d) failed", m->ion_client);
-        if (0 != ion_free(m->ion_client, ion_hnd))
-            AERR("ion_free(%d) failed", m->ion_client);
         close(shared_fd);
         return -1;
     }
@@ -94,7 +98,6 @@ static int gralloc_alloc_buffer(alloc_device_t* dev, size_t size, int usage, buf
             hnd->flags = private_handle_t::PRIV_FLAGS_USES_ION | private_handle_t::PRIV_FLAGS_USES_PHY;
         ALOGV("the flag 0x%x and the vadress is 0x%x and the size is 0x%x", hnd->flags, (int)cpu_ptr, size);
         hnd->share_fd = shared_fd;
-        hnd->ion_hnd = ion_hnd;
         *pHandle = hnd;
         ion_invalidate_fd(m->ion_client, hnd->share_fd);
         return 0;
@@ -104,9 +107,6 @@ static int gralloc_alloc_buffer(alloc_device_t* dev, size_t size, int usage, buf
         ret = munmap(cpu_ptr, size);
         if (0 != ret)
             AERR("munmap failed for base:%p size: %d", cpu_ptr, size);
-        ret = ion_free(m->ion_client, ion_hnd);
-        if (0 != ret)
-            AERR("ion_free(%d) failed", m->ion_client);
         return -1;
     }
 }
@@ -315,8 +315,6 @@ static int alloc_device_free(alloc_device_t* dev, buffer_handle_t handle)
                 AERR("Failed to munmap handle 0x%x", (unsigned int)hnd);
         }
         close(hnd->share_fd);
-        if (0 != ion_free(m->ion_client, hnd->ion_hnd))
-            AERR("Failed to ion_free(ion_client: %d ion_hnd: %p)", m->ion_client, hnd->ion_hnd);
         memset((void*)hnd, 0, sizeof(*hnd));
     }
 
