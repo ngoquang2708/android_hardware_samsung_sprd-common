@@ -148,11 +148,8 @@ struct private_handle_t {
 
     int phyaddr;
 
-#define SPRD_ION_NUM_INTS 1
     int __ion_client_padding;
     struct ion_handle *ion_hnd;
-#define GRALLOC_ARM_DMA_BUF_NUM_INTS 3 
-#define GRALLOC_ARM_NUM_FDS 1
 
 #ifdef __cplusplus
     /*
@@ -161,8 +158,8 @@ struct private_handle_t {
      * variables are used to track the number of integers that are conditionally
      * included.
      */
-    static const int sNumInts = 15 + SPRD_ION_NUM_INTS + GRALLOC_ARM_DMA_BUF_NUM_INTS;
-    static const int sNumFds = GRALLOC_ARM_NUM_FDS;
+    int __sNumInts_padding;
+    static const int sNumFds = 1;
     static const int sMagic = 0x3141592;
 
     private_handle_t(int flags, int usage, int size, int base, int lock_state) :
@@ -186,7 +183,7 @@ struct private_handle_t {
     {
         version = sizeof(native_handle);
         numFds = sNumFds;
-        numInts = sNumInts;
+        numInts = (sizeof(private_handle_t) - sizeof(native_handle)) / sizeof(int) - sNumFds;
     }
 
     private_handle_t(int flags, int usage, int size, int base, int lock_state, int fb_file, int fb_offset) :
@@ -210,7 +207,7 @@ struct private_handle_t {
     {
         version = sizeof(native_handle);
         numFds = sNumFds;
-        numInts = sNumInts;
+        numInts = (sizeof(private_handle_t) - sizeof(native_handle)) / sizeof(int) - sNumFds;
     }
 
     ~private_handle_t()
@@ -227,9 +224,15 @@ struct private_handle_t {
     {
         const private_handle_t *hnd = (const private_handle_t *)h;
 
-        if (!h || h->version != sizeof(native_handle) || h->numInts != sNumInts
-                || h->numFds != sNumFds || hnd->magic != sMagic)
-            return -EINVAL;
+		if (!hnd || hnd->version != sizeof(native_handle) || hnd->magic != sMagic)
+			return -EINVAL;
+
+		int numFds = sNumFds;
+		int numInts = (sizeof(private_handle_t) - sizeof(native_handle)) / sizeof(int) - sNumFds;
+
+		if (hnd->numFds != numFds || hnd->numInts != numInts)
+			return -EINVAL;
+
         return 0;
     }
 
