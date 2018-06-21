@@ -123,6 +123,7 @@ struct private_handle_t {
         LOCK_STATE_MAPPED       = 1 << 30,
         LOCK_STATE_READ_MASK    = 0x3FFFFFFF,
     };
+
     // ints
     /*shared file descriptor for dma_buf sharing*/
     int share_fd;
@@ -148,7 +149,7 @@ struct private_handle_t {
     int phyaddr;
 
 #define SPRD_ION_NUM_INTS 1
-    int ion_client;
+    int __ion_client_padding;
     struct ion_handle *ion_hnd;
 #define GRALLOC_ARM_DMA_BUF_NUM_INTS 3 
 #define GRALLOC_ARM_NUM_FDS 1
@@ -181,7 +182,6 @@ struct private_handle_t {
         yuv_info(MALI_YUV_NO_INFO),
         fd(0),
         offset(0),
-        ion_client(-1),
         ion_hnd(NULL)
     {
         version = sizeof(native_handle);
@@ -206,7 +206,6 @@ struct private_handle_t {
         yuv_info(MALI_YUV_NO_INFO),
         fd(fb_file),
         offset(fb_offset),
-        ion_client(-1),
         ion_hnd(NULL)
     {
         version = sizeof(native_handle);
