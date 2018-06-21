@@ -124,7 +124,7 @@ static int gralloc_alloc_framebuffer_locked(alloc_device_t* dev, size_t size,
             return err;
     }
 
-    const uint32_t bufferMask = m->bufferMask;
+    uint32_t bufferMask = m->bufferMask;
     const uint32_t numBuffers = m->numBuffers;
     const size_t bufferSize = m->finfo.line_length * m->info.yres;
     if (numBuffers == 1) {
@@ -137,8 +137,9 @@ static int gralloc_alloc_framebuffer_locked(alloc_device_t* dev, size_t size,
     }
 
     if (bufferMask >= ((1LU << numBuffers) - 1)) {
-        // We ran out of buffers.
-        return -ENOMEM;
+        // We ran out of buffers, reset bufferMask.
+        bufferMask = 0;
+        m->bufferMask = 0;
     }
 
     int vaddr = m->framebuffer->base;
