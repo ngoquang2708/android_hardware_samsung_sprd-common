@@ -5,6 +5,8 @@
 #
 # Copyright (C) 2016 The CyanogenMod Project
 #
+# Copyright (C) 2018 The LineageOS Project
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -34,44 +36,30 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_PROPRIETARY_MODULE := true
 
-SHARED_MEM_LIBS := \
-	libion_sprd \
-	libhardware
-
 LOCAL_SHARED_LIBRARIES := \
-	liblog \
-	libcutils \
-	libGLESv1_CM \
-	libsync \
-	$(SHARED_MEM_LIBS) \
+    liblog \
+    libcutils \
+    libhardware \
+    libion_sprd \
+    libsync \
+    libGLESv1_CM \
 
 LOCAL_STATIC_LIBRARIES := \
 	libarect \
 	libgralloc1-adapter \
 
 LOCAL_C_INCLUDES := \
-	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/ \
+    $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/ \
 
 LOCAL_HEADER_LIBRARIES := \
-	libnativebase_headers \
+    libnativebase_headers \
 
 LOCAL_ADDITIONAL_DEPENDENCIES := \
-	INSTALLED_KERNEL_HEADERS \
-
-LOCAL_EXPORT_C_INCLUDE_DIRS := \
-	$(LOCAL_PATH) \
-	$(LOCAL_C_INCLUDES) \
+    INSTALLED_KERNEL_HEADERS \
 
 LOCAL_CFLAGS := \
-	-DLOG_TAG=\"gralloc.$(TARGET_BOARD_PLATFORM)\" \
-
-ifeq ($(strip $(USE_UI_OVERLAY)),true)
-LOCAL_CFLAGS += -DUSE_UI_OVERLAY
-endif
-
-ifneq ($(strip $(TARGET_BUILD_VARIANT)),user)
-LOCAL_CFLAGS += -DDUMP_FB
-endif
+    -DLOG_TAG=\"gralloc.$(TARGET_BOARD_PLATFORM)\" \
+    -DLOG_NDEBUG=0 \
 
 ifeq ($(USE_SPRD_DITHER),true)
 LOCAL_CFLAGS += -DSPRD_DITHER_ENABLE
@@ -84,12 +72,11 @@ LOCAL_SHARED_LIBRARIES += libui
 endif
 
 LOCAL_SRC_FILES := \
-	gralloc_module.cpp \
-	alloc_device.cpp \
-	framebuffer_device.cpp \
-	dump_bmp.cpp \
+    gralloc_module.cpp \
+    alloc_device.cpp \
+    framebuffer_device.cpp \
+    mapper.cpp \
 
-#LOCAL_CFLAGS += -DMALI_VSYNC_EVENT_REPORT_ENABLE
 include $(BUILD_SHARED_LIBRARY)
 
 endif

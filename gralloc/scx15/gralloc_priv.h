@@ -3,6 +3,8 @@
  *
  * Copyright (C) 2008 The Android Open Source Project
  *
+ * Copyright (C) 2018 The LineageOS Project
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,23 +33,6 @@
 #include <alloc_device.h>
 #include <utils/Log.h>
 
-#ifdef MALI_600
-#define GRALLOC_ARM_UMP_MODULE 0
-#define GRALLOC_ARM_DMA_BUF_MODULE 1
-#else
-
-/* NOTE:
- * If your framebuffer device driver is integrated with UMP, you will have to
- * change this IOCTL definition to reflect your integration with the framebuffer
- * device.
- * Expected return value is a UMP secure id backing your framebuffer device memory.
- */
-
-/*#define IOCTL_GET_FB_UMP_SECURE_ID    _IOR('F', 311, unsigned int)*/
-#define GRALLOC_ARM_UMP_MODULE 0
-#define GRALLOC_ARM_DMA_BUF_MODULE 1
-#define SPRD_ION 0
-
 /* NOTE:
  * If your framebuffer device driver is integrated with dma_buf, you will have to
  * change this IOCTL definition to reflect your integration with the framebuffer
@@ -55,17 +40,11 @@
  * Expected return value is a structure filled with a file descriptor
  * backing your framebuffer device memory.
  */
-#if GRALLOC_ARM_DMA_BUF_MODULE
-struct fb_dmabuf_export
-{
-	__u32 fd;
-	__u32 flags;
+struct fb_dmabuf_export {
+    __u32 fd;
+    __u32 flags;
 };
-/*#define FBIOGET_DMABUF    _IOR('F', 0x21, struct fb_dmabuf_export)*/
-#endif /* GRALLOC_ARM_DMA_BUF_MODULE */
-
-
-#endif
+//#define FBIOGET_DMABUF    _IOR('F', 0x21, struct fb_dmabuf_export)
 
 #ifdef USE_3_FRAMEBUFFER
 #define NUM_FB_BUFFERS 3
@@ -73,303 +52,203 @@ struct fb_dmabuf_export
 #define NUM_FB_BUFFERS 2
 #endif
 
-#if GRALLOC_ARM_UMP_MODULE
-#include <ump/ump.h>
-#endif
-
-typedef enum
-{
-	MALI_YUV_NO_INFO,
-	MALI_YUV_BT601_NARROW,
-	MALI_YUV_BT601_WIDE,
-	MALI_YUV_BT709_NARROW,
-	MALI_YUV_BT709_WIDE,
+typedef enum {
+    MALI_YUV_NO_INFO,
+    MALI_YUV_BT601_NARROW,
+    MALI_YUV_BT601_WIDE,
+    MALI_YUV_BT709_NARROW,
+    MALI_YUV_BT709_WIDE,
 } mali_gralloc_yuv_info;
 
 enum {
-	HAL_PIXEL_FORMAT_YCbCr_420_P	= 0x13,
-	HAL_PIXEL_FORMAT_YCbCr_420_SP	= 0x19,
+    HAL_PIXEL_FORMAT_YCbCr_420_P    = 0x13,
+    HAL_PIXEL_FORMAT_YCbCr_420_SP   = 0x19,
 };
 
 enum {
-	GRALLOC_USAGE_OVERLAY_BUFFER	= 0x01000000,
-	GRALLOC_USAGE_VIDEO_BUFFER	= 0x02000000,
-	GRALLOC_USAGE_CAMERA_BUFFER	= 0x04000000,
+    GRALLOC_USAGE_OVERLAY_BUFFER    = 0x01000000,
+    GRALLOC_USAGE_VIDEO_BUFFER      = 0x02000000,
+    GRALLOC_USAGE_CAMERA_BUFFER     = 0x04000000,
 };
 
 struct private_handle_t;
 
-struct private_module_t
-{
-	gralloc_module_t base;
+struct private_module_t {
+    gralloc_module_t base;
 
-	private_handle_t *framebuffer;
-	uint32_t fbFormat;
-	uint32_t flags;
-	uint32_t numBuffers;
-	uint32_t bufferMask;
-	pthread_mutex_t lock;
-	pthread_mutex_t fd_lock;
-	buffer_handle_t currentBuffer;
-	int ion_client;
-#if SPRD_ION
-	int mIonFd;
-	int mIonBufNum;
-#endif
-	struct fb_var_screeninfo info;
-	struct fb_fix_screeninfo finfo;
-	float xdpi;
-	float ydpi;
-	float fps;
+    private_handle_t *framebuffer;
+    uint32_t fbFormat;
+    uint32_t flags;
+    uint32_t numBuffers;
+    uint32_t bufferMask;
+    pthread_mutex_t lock;
+    pthread_mutex_t fd_lock;
+    buffer_handle_t currentBuffer;
+    int ion_client;
+    struct fb_var_screeninfo info;
+    struct fb_fix_screeninfo finfo;
+    float xdpi;
+    float ydpi;
+    float fps;
 
-	enum
-	{
-		// flag to indicate we'll post this buffer
-		PRIV_USAGE_LOCKED_FOR_POST = 0x80000000
-	};
+    enum {
+        // flag to indicate we'll post this buffer
+        PRIV_USAGE_LOCKED_FOR_POST = 0x80000000
+    };
 
-	/* default constructor */
-	private_module_t();
+    /* default constructor */
+    private_module_t();
 };
 
 #ifdef __cplusplus
-struct private_handle_t : public native_handle
-{
+struct private_handle_t : public native_handle {
 #else
-struct private_handle_t
-{
-	struct native_handle nativeHandle;
-#endif
+struct private_handle_t {
+    struct native_handle nativeHandle;
+#endif /* __cplusplus */
 
-	enum
-	{
-		PRIV_FLAGS_FRAMEBUFFER = 0x00000001,
-		PRIV_FLAGS_USES_UMP    = 0x00000002,
-		PRIV_FLAGS_USES_ION    = 0x00000004,
-		PRIV_FLAGS_USES_PHY	 = 0x00000008,
-		PRIV_FLAGS_NOT_OVERLAY	 = 0x00000010,
+    enum {
+        PRIV_FLAGS_FRAMEBUFFER  = 0x00000001,
+        PRIV_FLAGS_USES_UMP     = 0x00000002,
+        PRIV_FLAGS_USES_ION     = 0x00000004,
+        PRIV_FLAGS_USES_PHY     = 0x00000008,
+        PRIV_FLAGS_NOT_OVERLAY  = 0x00000010,
 #ifdef SPRD_DITHER_ENABLE
-		PRIV_FLAGS_SPRD_DITHER = 0x80000000
+        PRIV_FLAGS_SPRD_DITHER  = 0x80000000,
 #endif
-	};
+    };
 
-	enum
-	{
-		LOCK_STATE_WRITE     =   1 << 31,
-		LOCK_STATE_MAPPED    =   1 << 30,
-		LOCK_STATE_READ_MASK =   0x3FFFFFFF
-	};
-#if SPRD_ION
-	//fds
-	int 	fd;
+    enum {
+        LOCK_STATE_WRITE        = 1 << 31,
+        LOCK_STATE_MAPPED       = 1 << 30,
+        LOCK_STATE_READ_MASK    = 0x3FFFFFFF,
+    };
+
+    // ints
+    /*shared file descriptor for dma_buf sharing*/
+    int share_fd;
+    int magic;
+    int flags;
+    int usage;
+    int size;
+    int width;
+    int height;
+    int format;
+    int stride;
+    int base;
+    int lockState;
+    int writeOwner;
+    int pid;
+
+    mali_gralloc_yuv_info yuv_info;
+
+    // Following members is for framebuffer only
+    int fd;
+    int offset;
+
+    int phyaddr;
+
+    int __ion_client_padding;
+    struct ion_handle *ion_hnd;
+
+#ifdef ADVERTISE_GRALLOC1
+    uint64_t backing_store;
+    uint64_t producer_usage;
+    uint64_t consumer_usage;
 #endif
-	// ints
-#if GRALLOC_ARM_DMA_BUF_MODULE
-	/*shared file descriptor for dma_buf sharing*/
-	int     share_fd;
-#endif
-	int     magic;
-	int     flags;
-	int     usage;
-	int     size;
-	int     width;
-	int     height;
-	int     format;
-	int     stride;
-	int     base;
-	int     lockState;
-	int     writeOwner;
-	int     pid;
-
-	mali_gralloc_yuv_info yuv_info;
-
-	// Following members are for UMP memory only
-#if GRALLOC_ARM_UMP_MODULE
-	int     ump_id;
-	int     ump_mem_handle;
-#define GRALLOC_ARM_UMP_NUM_INTS 2
-#else
-#define GRALLOC_ARM_UMP_NUM_INTS 0
-#endif
-
-	// Following members is for framebuffer only
-	int     fd;
-	int     offset;
-
-	int     phyaddr;
-
-#if SPRD_ION
-	int     resv0;
-	int     resv1;
-#endif
-
-#if SPRD_ION
-#define SPRD_ION_NUM_INTS 2
-#else
-#define SPRD_ION_NUM_INTS 1
-#endif
-#if GRALLOC_ARM_DMA_BUF_MODULE
-	int     ion_client;
-	struct ion_handle *ion_hnd;
-#define GRALLOC_ARM_DMA_BUF_NUM_INTS 3 
-#else
-#define GRALLOC_ARM_DMA_BUF_NUM_INTS 0
-#endif
-
-#if GRALLOC_ARM_DMA_BUF_MODULE
-#define GRALLOC_ARM_NUM_FDS 1
-#else
-#define GRALLOC_ARM_NUM_FDS 0
-#endif
-
-	uint64_t backing_store;
-	uint64_t producer_usage;
-	uint64_t consumer_usage;
 
 #ifdef __cplusplus
-	/*
-	 * We track the number of integers in the structure. There are 11 unconditional
-	 * integers (magic - pid, yuv_info, fd and offset). The GRALLOC_ARM_XXX_NUM_INTS
-	 * variables are used to track the number of integers that are conditionally
-	 * included.
-	 */
-	static const int sNumInts = 15 + SPRD_ION_NUM_INTS + GRALLOC_ARM_UMP_NUM_INTS + GRALLOC_ARM_DMA_BUF_NUM_INTS;
-	static const int sNumFds = GRALLOC_ARM_NUM_FDS;
-	static const int sMagic = 0x3141592;
+    /*
+     * We track the number of integers in the structure. There are 11 unconditional
+     * integers (magic - pid, yuv_info, fd and offset). The GRALLOC_ARM_XXX_NUM_INTS
+     * variables are used to track the number of integers that are conditionally
+     * included.
+     */
+    int __sNumInts_padding;
+    static const int sNumFds = 1;
+    static const int sMagic = 0x3141592;
 
-#if GRALLOC_ARM_UMP_MODULE
-	private_handle_t(int flags, int usage, int size, int base, int lock_state, ump_secure_id secure_id, ump_handle handle, int offset = 0, int fd = 0):
-#if GRALLOC_ARM_DMA_BUF_MODULE
-		share_fd(-1),
-#endif
-		magic(sMagic),
-		flags(flags),
-		usage(usage),
-		size(size),
-		width(0),
-		height(0),
-		format(0),
-		stride(0),
-		base(base),
-		lockState(lock_state),
-		writeOwner(0),
-		pid(getpid()),
-		yuv_info(MALI_YUV_NO_INFO),
-		ump_id((int)secure_id),
-		ump_mem_handle((int)handle),
-		fd(fd),
-		offset(offset)
-#if GRALLOC_ARM_DMA_BUF_MODULE
-		,ion_client(-1),
-		ion_hnd(NULL)
-#endif
+    private_handle_t(int flags, int usage, int size, int base, int lock_state) :
+        share_fd(-1),
+        magic(sMagic),
+        flags(flags),
+        usage(usage),
+        size(size),
+        width(0),
+        height(0),
+        format(0),
+        stride(0),
+        base(base),
+        lockState(lock_state),
+        writeOwner(0),
+        pid(getpid()),
+        yuv_info(MALI_YUV_NO_INFO),
+        fd(0),
+        offset(0),
+        ion_hnd(NULL)
+    {
+        version = sizeof(native_handle);
+        numFds = sNumFds;
+        numInts = (sizeof(private_handle_t) - sizeof(native_handle)) / sizeof(int) - sNumFds;
+    }
 
-	{
-		version = sizeof(native_handle);
-		numFds = sNumFds;
-		numInts = sNumInts;
-	}
-#endif
+    private_handle_t(int flags, int usage, int size, int base, int lock_state, int fb_file, int fb_offset) :
+        share_fd(-1),
+        magic(sMagic),
+        flags(flags),
+        usage(usage),
+        size(size),
+        width(0),
+        height(0),
+        format(0),
+        stride(0),
+        base(base),
+        lockState(lock_state),
+        writeOwner(0),
+        pid(getpid()),
+        yuv_info(MALI_YUV_NO_INFO),
+        fd(fb_file),
+        offset(fb_offset),
+        ion_hnd(NULL)
+    {
+        version = sizeof(native_handle);
+        numFds = sNumFds;
+        numInts = (sizeof(private_handle_t) - sizeof(native_handle)) / sizeof(int) - sNumFds;
+    }
 
-#if GRALLOC_ARM_DMA_BUF_MODULE
-	private_handle_t(int flags, int usage, int size, int base, int lock_state):
-		share_fd(-1),
-		magic(sMagic),
-		flags(flags),
-		usage(usage),
-		size(size),
-		width(0),
-		height(0),
-		format(0),
-		stride(0),
-		base(base),
-		lockState(lock_state),
-		writeOwner(0),
-		pid(getpid()),
-		yuv_info(MALI_YUV_NO_INFO),
-#if GRALLOC_ARM_UMP_MODULE
-		ump_id((int)UMP_INVALID_SECURE_ID),
-		ump_mem_handle((int)UMP_INVALID_MEMORY_HANDLE),
-#endif
-		fd(0),
-		offset(0),
-		ion_client(-1),
-		ion_hnd(NULL)
+    ~private_handle_t()
+    {
+        magic = 0;
+    }
 
-	{
-		version = sizeof(native_handle);
-		numFds = sNumFds;
-		numInts = sNumInts;
-	}
+    bool usesPhysicallyContiguousMemory()
+    {
+        return (flags & (PRIV_FLAGS_FRAMEBUFFER | PRIV_FLAGS_USES_PHY));
+    }
 
-#endif
+    static int validate(const native_handle *h)
+    {
+        const private_handle_t *hnd = (const private_handle_t *)h;
 
-	private_handle_t(int flags, int usage, int size, int base, int lock_state, int fb_file, int fb_offset):
-#if GRALLOC_ARM_DMA_BUF_MODULE
-		share_fd(-1),
-#endif
-		magic(sMagic),
-		flags(flags),
-		usage(usage),
-		size(size),
-		width(0),
-		height(0),
-		format(0),
-		stride(0),
-		base(base),
-		lockState(lock_state),
-		writeOwner(0),
-		pid(getpid()),
-		yuv_info(MALI_YUV_NO_INFO),
-#if GRALLOC_ARM_UMP_MODULE
-		ump_id((int)UMP_INVALID_SECURE_ID),
-		ump_mem_handle((int)UMP_INVALID_MEMORY_HANDLE),
-#endif
-		fd(fb_file),
-		offset(fb_offset)
-#if GRALLOC_ARM_DMA_BUF_MODULE
-		,ion_client(-1),
-		ion_hnd(NULL)
-#endif
+        if (!hnd || hnd->version != sizeof(native_handle) || hnd->magic != sMagic)
+            return -EINVAL;
 
-	{
-		version = sizeof(native_handle);
-		numFds = sNumFds;
-		numInts = sNumInts;
-	}
+        int numFds = sNumFds;
+        int numInts = (sizeof(private_handle_t) - sizeof(native_handle)) / sizeof(int) - sNumFds;
 
-	~private_handle_t()
-	{
-		magic = 0;
-	}
+        if (hnd->numFds != numFds || hnd->numInts != numInts)
+            return -EINVAL;
 
-	bool usesPhysicallyContiguousMemory()
-	{
-		return (flags & (PRIV_FLAGS_FRAMEBUFFER|PRIV_FLAGS_USES_PHY)) ? true : false;
-	}
+        return 0;
+    }
 
-	static int validate(const native_handle *h)
-	{
-		const private_handle_t *hnd = (const private_handle_t *)h;
-
-		if (!h || h->version != sizeof(native_handle) || h->numInts != sNumInts || h->numFds != sNumFds || hnd->magic != sMagic)
-		{
-			return -EINVAL;
-		}
-
-		return 0;
-	}
-
-	static private_handle_t *dynamicCast(const native_handle *in)
-	{
-		if (validate(in) == 0)
-		{
-			return (private_handle_t *) in;
-		}
-
-		return NULL;
-	}
-#endif
+    static private_handle_t *dynamicCast(const native_handle *in)
+    {
+        if (validate(in) == 0)
+            return (private_handle_t *) in;
+        return NULL;
+    }
+#endif /* __cplusplus */
 };
 
 #endif /* GRALLOC_PRIV_H_ */
