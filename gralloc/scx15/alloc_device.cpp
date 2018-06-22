@@ -80,7 +80,7 @@ static int gralloc_alloc_buffer(alloc_device_t* dev, size_t size, int usage, buf
 
     // ion_hnd is no longer needed once we acquire shared_fd.
     if (0 != ion_free(m->ion_client, ion_hnd))
-	    AWAR("ion_free( %d ) failed", m->ion_client);
+        AWAR("ion_free( %d ) failed", m->ion_client);
     ion_hnd = NULL;
 
     cpu_ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, shared_fd, 0);

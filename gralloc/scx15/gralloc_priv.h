@@ -224,14 +224,14 @@ struct private_handle_t {
     {
         const private_handle_t *hnd = (const private_handle_t *)h;
 
-		if (!hnd || hnd->version != sizeof(native_handle) || hnd->magic != sMagic)
-			return -EINVAL;
+        if (!hnd || hnd->version != sizeof(native_handle) || hnd->magic != sMagic)
+            return -EINVAL;
 
-		int numFds = sNumFds;
-		int numInts = (sizeof(private_handle_t) - sizeof(native_handle)) / sizeof(int) - sNumFds;
+        int numFds = sNumFds;
+        int numInts = (sizeof(private_handle_t) - sizeof(native_handle)) / sizeof(int) - sNumFds;
 
-		if (hnd->numFds != numFds || hnd->numInts != numInts)
-			return -EINVAL;
+        if (hnd->numFds != numFds || hnd->numInts != numInts)
+            return -EINVAL;
 
         return 0;
     }
