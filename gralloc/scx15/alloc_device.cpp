@@ -287,7 +287,9 @@ static int alloc_device_alloc(alloc_device_t* dev, int w, int h, int format,
     hnd->height = h;
     hnd->format = format;
     hnd->stride = stride;
+#ifdef ADVERTISE_GRALLOC1
     hnd->backing_store = next_backing_store_id();
+#endif
 
     *pStride = stride;
     return 0;
