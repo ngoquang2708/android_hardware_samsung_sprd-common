@@ -44,11 +44,13 @@
 
 #define GRALLOC_ALIGN(value, base) (((value) + ((base) - 1)) & ~((base) - 1))
 
+#ifdef ADVERTISE_GRALLOC1
 static uint64_t next_backing_store_id()
 {
     static std::atomic<uint64_t> next_id(1);
     return next_id++;
 }
+#endif
 
 static int gralloc_alloc_buffer(alloc_device_t* dev, size_t size, int usage, buffer_handle_t* pHandle) {
     private_module_t* m = reinterpret_cast<private_module_t*>(dev->common.module);

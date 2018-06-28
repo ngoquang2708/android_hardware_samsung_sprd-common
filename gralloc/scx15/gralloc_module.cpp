@@ -23,7 +23,9 @@
 #include <hardware/hardware.h>
 #include <hardware/gralloc.h>
 
+#ifdef ADVERTISE_GRALLOC1
 #include <gralloc1-adapter.h>
+#endif
 
 #include "gralloc_priv.h"
 #include "alloc_device.h"
