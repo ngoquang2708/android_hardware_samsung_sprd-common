@@ -2307,7 +2307,13 @@ Return<void> RadioImpl::setDataAllowed(int32_t serial, bool allow) {
 #if VDBG
     RLOGD("setDataAllowed: serial %d", serial);
 #endif
-    dispatchInts(serial, mSlotId, RIL_REQUEST_ALLOW_DATA, 1, BOOL_TO_INT(allow));
+    if (allow) {
+        const uint8_t RAW_HOOK_OEM_CMD_SWITCH_DATAPREFER[] = { 0x09, 0x04 };
+        hidl_vec<uint8_t> data;
+        data.setToExternal((uint8_t *) RAW_HOOK_OEM_CMD_SWITCH_DATAPREFER,
+                sizeof(RAW_HOOK_OEM_CMD_SWITCH_DATAPREFER));
+        oemHookService[0]->sendRequestRaw(serial, data);
+    }
     return Void();
 }
 
