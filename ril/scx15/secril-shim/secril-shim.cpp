@@ -70,6 +70,23 @@ static bool onRequestGetRadioCapability(RIL_Token t)
 	return true;
 }
 
+static void onRequestAllowData(int request, void *data, size_t datalen, RIL_Token t) {
+	RLOGI("%s: got request %s (data:%p datalen:%d)\n", __FUNCTION__,
+			requestToString(request),
+			data, datalen);
+
+	const char rawHookCmd[] = { 0x09, 0x04 }; // RAW_HOOK_OEM_CMD_SWITCH_DATAPREFER
+	bool allowed = *((int *)data) == 0 ? false : true;
+
+	if (allowed) {
+		RequestInfo *pRI = (RequestInfo *)t;
+		pRI->pCI->requestNumber = RIL_REQUEST_OEM_HOOK_RAW;
+		origRilFunctions->onRequest(pRI->pCI->requestNumber, (void *)rawHookCmd, sizeof(rawHookCmd), t);
+	}
+
+	rilEnv->OnRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
+}
+
 static void onRequestDial(int request, void *data, RIL_Token t) {
 	RIL_Dial dial;
 	RIL_CallDetails *cds;
@@ -111,6 +128,10 @@ static void onRequestShim(int request, void *data, size_t datalen, RIL_Token t)
 		/* Necessary; RILJ may fake this for us if we reply not supported, but we can just implement it. */
 		case RIL_REQUEST_GET_RADIO_CAPABILITY:
 			onRequestGetRadioCapability(t);
+			RLOGI("%s: got request %s: replied with our implementation!\n", __FUNCTION__, requestToString(request));
+			return;
+		case RIL_REQUEST_ALLOW_DATA:
+			onRequestAllowData(request, data, datalen, t);
 			RLOGI("%s: got request %s: replied with our implementation!\n", __FUNCTION__, requestToString(request));
 			return;
 		/* The following requests were introduced post-4.3. */
