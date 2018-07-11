@@ -18,7 +18,7 @@
 #include <sys/reboot.h>
 #include <linux/rtc.h>
 
-#define REF_DEBUG
+//#define REF_DEBUG
 
 #ifdef REF_DEBUG
 #define REF_LOGD(x...) ALOGD( x )
