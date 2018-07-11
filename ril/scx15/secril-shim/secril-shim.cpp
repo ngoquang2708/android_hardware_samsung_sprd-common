@@ -82,9 +82,9 @@ static void onRequestAllowData(int request, void *data, size_t datalen, RIL_Toke
 		RequestInfo *pRI = (RequestInfo *)t;
 		pRI->pCI->requestNumber = RIL_REQUEST_OEM_HOOK_RAW;
 		origRilFunctions->onRequest(pRI->pCI->requestNumber, (void *)rawHookCmd, sizeof(rawHookCmd), t);
+	} else {
+		rilEnv->OnRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
 	}
-
-	rilEnv->OnRequestComplete(t, RIL_E_SUCCESS, NULL, 0);
 }
 
 static void onRequestDial(int request, void *data, RIL_Token t) {
