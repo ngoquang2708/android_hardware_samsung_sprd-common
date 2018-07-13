@@ -16,6 +16,8 @@ LOCAL_SHARED_LIBRARIES := \
     libhardware_legacy \
     liblog
 
+LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)
+
 LOCAL_PROPRIETARY_MODULE := true
 
 LOCAL_MODULE:= libsecril-client
