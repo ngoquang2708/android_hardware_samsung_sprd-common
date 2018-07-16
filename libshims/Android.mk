@@ -38,4 +38,13 @@ LOCAL_PROPRIETARY_MODULE := true
 LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 include $(BUILD_SHARED_LIBRARY)
 
+include $(CLEAR_VARS)
+LOCAL_SRC_FILES := phoneserver_shim.cpp
+LOCAL_SHARED_LIBRARIES := libdl liblog libcutils
+LOCAL_MODULE := libphoneserver_shim
+LOCAL_MODULE_TAGS := optional
+LOCAL_PROPRIETARY_MODULE := true
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+include $(BUILD_SHARED_LIBRARY)
+
 include $(call all-makefiles-under,$(LOCAL_PATH))
