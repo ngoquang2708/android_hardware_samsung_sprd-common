@@ -23,10 +23,6 @@
 #include <hardware/hardware.h>
 #include <hardware/gralloc.h>
 
-#ifdef ADVERTISE_GRALLOC1
-#include <gralloc1-adapter.h>
-#endif
-
 #include "gralloc_priv.h"
 #include "alloc_device.h"
 #include "framebuffer_device.h"
@@ -64,11 +60,6 @@ static int gralloc_device_open(const hw_module_t* module, const char* name, hw_d
 {
     int status = -EINVAL;
 
-#ifdef ADVERTISE_GRALLOC1
-    if (!strcmp(name, GRALLOC_HARDWARE_MODULE_ID))
-        return gralloc1_adapter_device_open(module, name, device);
-#endif
-
     if (!strcmp(name, GRALLOC_HARDWARE_GPU0))
         status = alloc_device_open(module, name, device);
     else if (!strcmp(name, GRALLOC_HARDWARE_FB0))
@@ -86,11 +77,7 @@ private_module_t::private_module_t()
 #define INIT_ZERO(obj) (memset(&(obj),0,sizeof((obj))))
 
     base.common.tag = HARDWARE_MODULE_TAG;
-#ifdef ADVERTISE_GRALLOC1
-    base.common.version_major = GRALLOC1_ADAPTER_MODULE_API_VERSION_1_0;
-#else
     base.common.version_major = 1;
-#endif
     base.common.version_minor = 0;
     base.common.id = GRALLOC_HARDWARE_MODULE_ID;
     base.common.name = "Graphics Memory Allocator Module";

@@ -32,10 +32,6 @@
 #include <hardware/hardware.h>
 #include <hardware/gralloc.h>
 
-#ifdef ADVERTISE_GRALLOC1
-#include <gralloc1-adapter.h>
-#endif
-
 #include "gralloc_priv.h"
 #include "alloc_device.h"
 #include "framebuffer_device.h"
@@ -277,74 +273,7 @@ int gralloc_perform(struct gralloc_module_t const* module,
     va_list args;
     va_start(args, operation);
     switch (operation) {
-#ifdef ADVERTISE_GRALLOC1
-        case GRALLOC1_ADAPTER_PERFORM_GET_REAL_MODULE_API_VERSION_MINOR: {
-            auto outMinorVersion = va_arg(args, int*);
-            *outMinorVersion = 0;
-            break;
-        };
-        case GRALLOC1_ADAPTER_PERFORM_SET_USAGES: {
-            auto hnd =  va_arg(args, private_handle_t*);
-            auto producerUsage = va_arg(args, uint64_t);
-            auto consumerUsage = va_arg(args, uint64_t);
-            hnd->producer_usage = producerUsage;
-            hnd->consumer_usage = consumerUsage;
-            break;
-        }
-
-        case GRALLOC1_ADAPTER_PERFORM_GET_DIMENSIONS: {
-            auto hnd =  va_arg(args, private_handle_t*);
-            auto outWidth = va_arg(args, int*);
-            auto outHeight = va_arg(args, int*);
-            *outWidth = hnd->width;
-            *outHeight = hnd->height;
-            break;
-        }
-
-        case GRALLOC1_ADAPTER_PERFORM_GET_FORMAT: {
-            auto hnd =  va_arg(args, private_handle_t*);
-            auto outFormat = va_arg(args, int*);
-            *outFormat = hnd->format;
-            break;
-        }
-
-        case GRALLOC1_ADAPTER_PERFORM_GET_PRODUCER_USAGE: {
-            auto hnd =  va_arg(args, private_handle_t*);
-            auto outUsage = va_arg(args, uint64_t*);
-            *outUsage = hnd->producer_usage;
-            break;
-        }
-
-        case GRALLOC1_ADAPTER_PERFORM_GET_CONSUMER_USAGE: {
-            auto hnd =  va_arg(args, private_handle_t*);
-            auto outUsage = va_arg(args, uint64_t*);
-            *outUsage = hnd->consumer_usage;
-            break;
-        }
-
-        case GRALLOC1_ADAPTER_PERFORM_GET_BACKING_STORE: {
-            auto hnd =  va_arg(args, private_handle_t*);
-            auto outBackingStore = va_arg(args, uint64_t*);
-            *outBackingStore = hnd->backing_store;
-            break;
-        }
-
-        case GRALLOC1_ADAPTER_PERFORM_GET_NUM_FLEX_PLANES: {
-            auto hnd =  va_arg(args, private_handle_t*);
-            auto outNumFlexPlanes = va_arg(args, int*);
-            (void) hnd;
-            // for simpilicity
-            *outNumFlexPlanes = 4;
-            break;
-        }
-
-        case GRALLOC1_ADAPTER_PERFORM_GET_STRIDE: {
-            auto hnd =  va_arg(args, private_handle_t*);
-            auto outStride = va_arg(args, int*);
-            *outStride = hnd->width;
-            break;
-        }
-#endif // ADVERTISE_GRALLOC1
+        // no-ops
     }
     va_end(args);
     return res;

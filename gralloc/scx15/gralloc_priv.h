@@ -100,13 +100,7 @@ struct private_module_t {
     private_module_t();
 };
 
-#ifdef __cplusplus
 struct private_handle_t : public native_handle {
-#else
-struct private_handle_t {
-    struct native_handle nativeHandle;
-#endif /* __cplusplus */
-
     enum {
         PRIV_FLAGS_FRAMEBUFFER  = 0x00000001,
         PRIV_FLAGS_USES_UMP     = 0x00000002,
@@ -148,24 +142,19 @@ struct private_handle_t {
 
     int phyaddr;
 
-    int __ion_client_padding;
-    struct ion_handle *ion_hnd;
+    int ion_client; // not used
+    struct ion_handle *ion_hnd; // not used
 
-#ifdef ADVERTISE_GRALLOC1
-    uint64_t backing_store;
-    uint64_t producer_usage;
-    uint64_t consumer_usage;
-#endif
+    int padding[1]; // required to keep number of ints equal to sNumInts
 
-#ifdef __cplusplus
     /*
      * We track the number of integers in the structure. There are 11 unconditional
      * integers (magic - pid, yuv_info, fd and offset). The GRALLOC_ARM_XXX_NUM_INTS
      * variables are used to track the number of integers that are conditionally
      * included.
      */
-    int __sNumInts_padding;
     static const int sNumFds = 1;
+    static const int sNumInts = 19;
     static const int sMagic = 0x3141592;
 
     private_handle_t(int flags, int usage, int size, int base, int lock_state) :
@@ -185,11 +174,13 @@ struct private_handle_t {
         yuv_info(MALI_YUV_NO_INFO),
         fd(0),
         offset(0),
+        phyaddr(0),
+        ion_client(-1),
         ion_hnd(NULL)
     {
         version = sizeof(native_handle);
         numFds = sNumFds;
-        numInts = (sizeof(private_handle_t) - sizeof(native_handle)) / sizeof(int) - sNumFds;
+        numInts = sNumInts;
     }
 
     private_handle_t(int flags, int usage, int size, int base, int lock_state, int fb_file, int fb_offset) :
@@ -209,11 +200,13 @@ struct private_handle_t {
         yuv_info(MALI_YUV_NO_INFO),
         fd(fb_file),
         offset(fb_offset),
+        phyaddr(0),
+        ion_client(-1),
         ion_hnd(NULL)
     {
         version = sizeof(native_handle);
         numFds = sNumFds;
-        numInts = (sizeof(private_handle_t) - sizeof(native_handle)) / sizeof(int) - sNumFds;
+        numInts = sNumInts;
     }
 
     ~private_handle_t()
@@ -233,10 +226,7 @@ struct private_handle_t {
         if (!hnd || hnd->version != sizeof(native_handle) || hnd->magic != sMagic)
             return -EINVAL;
 
-        int numFds = sNumFds;
-        int numInts = (sizeof(private_handle_t) - sizeof(native_handle)) / sizeof(int) - sNumFds;
-
-        if (hnd->numFds != numFds || hnd->numInts != numInts)
+        if (hnd->numFds != sNumFds || hnd->numInts != sNumInts)
             return -EINVAL;
 
         return 0;
@@ -248,7 +238,6 @@ struct private_handle_t {
             return (private_handle_t *) in;
         return NULL;
     }
-#endif /* __cplusplus */
 };
 
 #endif /* GRALLOC_PRIV_H_ */
