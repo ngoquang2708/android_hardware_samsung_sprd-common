@@ -1,0 +1,8 @@
+cc_library_static {
+    srcs: ["healthd_board_scx15.cpp"],
+    name: "libhealthd.scx15",
+    vendor_available: true,
+    cflags: ["-Werror"],
+    include_dirs: ["system/core/base/include"],
+    header_libs: ["libhealthd_headers"],
+}
