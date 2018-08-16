@@ -16,7 +16,7 @@
 
 //#define LOG_NDEBUG 0
 #define LOG_TAG "SPRDMPEG4Decoder"
-#include <utils/Log.h>
+#include <log/log.h>
 
 #include "SPRDMPEG4Decoder.h"
 

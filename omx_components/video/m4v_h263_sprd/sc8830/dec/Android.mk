@@ -6,13 +6,6 @@ LOCAL_SRC_FILES := \
 	SPRDMPEG4Decoder.cpp \
 
 LOCAL_C_INCLUDES := \
-	frameworks/av/media/libstagefright/include \
-	frameworks/native/include/media/openmax \
-	frameworks/native/include/media/hardware \
-	frameworks/native/include/ui \
-	frameworks/native/include/utils \
-	frameworks/native/include/media/hardware \
-	hardware/sprd/gralloc/$(TARGET_BOARD_PLATFORM) \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include \
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
@@ -24,13 +17,15 @@ LOCAL_CFLAGS := \
 
 LOCAL_ARM_MODE := arm
 
+LOCAL_HEADER_LIBRARIES := \
+	libgralloc_headers_$(TARGET_BOARD_PLATFORM) \
+
 LOCAL_SHARED_LIBRARIES := \
-	libstagefright \
+	libmedia_omx \
 	libstagefright_omx \
 	libstagefright_foundation \
 	libstagefrighthw \
 	libmemoryheapion_sprd \
-	libmedia \
 	libutils \
 	libui \
 	libdl \

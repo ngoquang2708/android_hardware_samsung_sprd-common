@@ -22,11 +22,6 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := \
 	SPRDAACDecoder.cpp
 
-LOCAL_C_INCLUDES := \
-	frameworks/av/media/libstagefright/include \
-	frameworks/native/include/media/openmax \
-	frameworks/av/include/media/stagefright
-
 LOCAL_CFLAGS := \
 	-DOSCL_EXPORT_REF= \
 	-DOSCL_IMPORT_REF= \
@@ -38,12 +33,11 @@ LOCAL_LDFLAGS := \
 	-Wl,--no-warn-shared-textrel
 
 LOCAL_SHARED_LIBRARIES := \
-	libstagefright \
+	libmedia_omx \
 	libstagefright_omx \
 	libstagefright_foundation \
 	libstagefrighthw \
 	libmemoryheapion_sprd \
-	libmedia \
 	libutils \
 	libui \
 	libdl \

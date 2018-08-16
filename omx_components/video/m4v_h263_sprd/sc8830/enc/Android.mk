@@ -6,10 +6,7 @@ LOCAL_SRC_FILES := \
 	SPRDMPEG4Encoder.cpp \
 
 LOCAL_C_INCLUDES := \
-	frameworks/av/media/libstagefright/include \
-	frameworks/native/include/media/openmax \
-	frameworks/native/include/media/hardware \
-	frameworks/native/include \
+	frameworks/av/include \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include \
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
@@ -22,12 +19,11 @@ LOCAL_CFLAGS := \
 LOCAL_ARM_MODE := arm
 
 LOCAL_SHARED_LIBRARIES := \
-	libstagefright \
+	libmedia_omx \
 	libstagefright_omx \
 	libstagefright_foundation \
 	libstagefrighthw \
 	libmemoryheapion_sprd \
-	libmedia \
 	libutils \
 	libui \
 	libdl \

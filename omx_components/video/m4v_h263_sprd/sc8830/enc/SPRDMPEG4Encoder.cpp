@@ -16,7 +16,7 @@
 
 #define LOG_NDEBUG 0
 #define LOG_TAG "SPRDMPEG4Encoder"
-#include <utils/Log.h>
+#include <log/log.h>
 
 #include "m4v_h263_enc_api.h"
 
@@ -26,8 +26,8 @@
 #include <media/stagefright/MetaData.h>
 #include <media/stagefright/Utils.h>
 
-#include <MetadataBufferType.h>
-#include <HardwareAPI.h>
+#include <media/hardware/MetadataBufferType.h>
+#include <media/hardware/HardwareAPI.h>
 
 #include <ui/Rect.h>
 #include <ui/GraphicBufferMapper.h>

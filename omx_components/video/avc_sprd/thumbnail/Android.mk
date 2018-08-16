@@ -5,10 +5,6 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := \
 	SoftSPRDAVC.cpp \
 
-LOCAL_C_INCLUDES := \
-	frameworks/av/media/libstagefright/include \
-	frameworks/native/include/media/openmax \
-
 LOCAL_CFLAGS := \
 	-DOSCL_EXPORT_REF= \
 	-DOSCL_IMPORT_REF=
@@ -16,12 +12,11 @@ LOCAL_CFLAGS := \
 LOCAL_ARM_MODE := arm
 
 LOCAL_SHARED_LIBRARIES := \
-	libstagefright \
+	libmedia_omx \
 	libstagefright_omx \
 	libstagefright_foundation \
 	libstagefrighthw \
 	libmemoryheapion_sprd \
-	libmedia \
 	libutils \
 	libdl \
 	liblog \
