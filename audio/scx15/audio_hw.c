@@ -27,7 +27,7 @@
 #include <sys/mman.h>
 #include <semaphore.h>
 
-#include <cutils/log.h>
+#include <log/log.h>
 #include <cutils/str_parms.h>
 #include <cutils/properties.h>
 

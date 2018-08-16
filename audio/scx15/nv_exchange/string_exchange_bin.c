@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "string_exchange_bin.h"
-#include <cutils/log.h>
+#include <log/log.h>
 #include <expat.h>
 #include <sys/types.h>
 #include <cutils/properties.h>

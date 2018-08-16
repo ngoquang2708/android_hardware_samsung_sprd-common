@@ -16,7 +16,7 @@
 
 #define ALOG_NDEBUG 0
 #define LOG_TAG "TinyAlsaUtils"
-#include <utils/Log.h>
+#include <log/log.h>
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -18,7 +18,7 @@
 #define LOG_NDEBUG 0
 #define LOG_TAG "DUMP.DATA"
 
-#include <cutils/log.h>
+#include <log/log.h>
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>

@@ -23,7 +23,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include <cutils/log.h>
+#include <log/log.h>
 
 #include <tinyalsa/asoundlib.h>
 

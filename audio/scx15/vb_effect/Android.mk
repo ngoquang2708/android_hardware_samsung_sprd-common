@@ -45,6 +45,9 @@ LOCAL_EXPORT_C_INCLUDE_DIRS := \
 	$(LOCAL_PATH)/$(BOARD_EQ_DIR) \
 	$(LOCAL_C_INCLUDES) \
 
+LOCAL_HEADER_LIBRARIES := \
+	libaudio_system_headers \
+
 LOCAL_SHARED_LIBRARIES := \
 	liblog \
 	libc \

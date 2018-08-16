@@ -5,7 +5,7 @@
 #include <sys/select.h>
 #include <fcntl.h>
 #include <tinyalsa/asoundlib.h>
-#include <cutils/log.h>
+#include <log/log.h>
 #include <pthread.h>
 
 

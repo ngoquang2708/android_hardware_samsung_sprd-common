@@ -17,11 +17,7 @@
 #define __VBC_CODEC_H
 
 #define LOG_TAG  "vbc_effect"
-
-
-/* #include <asm/io.h> */
-#include <cutils/log.h>
-
+#include <log/log.h>
 
 #define printk   ALOGW
 
