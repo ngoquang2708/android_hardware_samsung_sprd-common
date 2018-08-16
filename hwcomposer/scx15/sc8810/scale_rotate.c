@@ -16,7 +16,8 @@
 
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <cutils/log.h>
+#include <log/log.h>
+
 #include "sprd_scale.h"
 #include "sprd_rotation.h"
 #include "scale_rotate.h"

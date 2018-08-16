@@ -44,7 +44,8 @@
 #include <hardware/hwcomposer.h>
 #include <utils/RefBase.h>
 #include <cutils/atomic.h>
-#include <cutils/log.h>
+#include <log/log.h>
+
 #include "gralloc_priv.h"
 #include "sc8825/dcam_hal.h"
 

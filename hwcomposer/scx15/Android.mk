@@ -37,6 +37,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libhardware \
 	libui \
 	libsync \
+	libbinder \
 	libmemoryheapion_sprd \
 
 LOCAL_SRC_FILES := \

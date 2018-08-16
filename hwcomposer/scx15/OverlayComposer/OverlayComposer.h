@@ -77,7 +77,7 @@
 #include <utils/Thread.h>
 #include <semaphore.h>
 
-#include <cutils/log.h>
+#include <log/log.h>
 #include <utils/RefBase.h>
 #include <utils/List.h>
 

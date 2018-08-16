@@ -22,8 +22,9 @@
 #endif
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <cutils/log.h>
 #include <stdlib.h>
+
+#include <log/log.h>
 #include <hardware/hardware.h>
 
 #include <video/gsp_types_shark.h>

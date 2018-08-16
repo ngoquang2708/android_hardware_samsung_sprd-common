@@ -8,7 +8,7 @@
 
 #include <video/sprd_fb.h>
 
-#include <cutils/log.h>
+#include <log/log.h>
 
 #include <system/graphics.h>
 #include <cutils/properties.h>

@@ -38,7 +38,8 @@
 #ifndef _SPRD_OVERLAY_PLANE_H_
 #define _SPRD_OVERLAY_PLANE_H_
 
-#include <cutils/log.h>
+#include <log/log.h>
+
 #include "SprdDisplayPlane.h"
 #include "SprdHWLayer.h"
 #include "SprdFrameBufferHAL.h"

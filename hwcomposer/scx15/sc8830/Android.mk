@@ -30,6 +30,10 @@ LOCAL_MODULE := sprd_gsp.$(TARGET_BOARD_PLATFORM)
 
 LOCAL_MODULE_RELATIVE_PATH := hw
 
+LOCAL_HEADER_LIBRARIES := \
+	libgralloc_headers_$(TARGET_BOARD_PLATFORM) \
+	libsystem_headers \
+
 LOCAL_SHARED_LIBRARIES := \
 	liblog \
 

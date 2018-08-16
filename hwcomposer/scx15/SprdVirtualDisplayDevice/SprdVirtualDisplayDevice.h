@@ -43,7 +43,7 @@
 #include <hardware/gralloc.h>
 #include <hardware/hwcomposer.h>
 
-#include <cutils/log.h>
+#include <log/log.h>
 
 #include "../SprdDisplayDevice.h"
 #include "../AndroidFence.h"

@@ -45,7 +45,7 @@
 #include <hardware/hardware.h>
 #include <hardware/gralloc.h>
 #include <utils/RefBase.h>
-#include <cutils/log.h>
+#include <log/log.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 

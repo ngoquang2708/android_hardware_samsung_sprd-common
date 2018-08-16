@@ -41,7 +41,7 @@
 
 #include <utils/Thread.h>
 #include <utils/RefBase.h>
-#include <cutils/log.h>
+#include <log/log.h>
 #include <semaphore.h>
 #include <MemoryHeapIon.h>
 #include <ui/Rect.h>

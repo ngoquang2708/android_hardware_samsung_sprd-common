@@ -33,13 +33,14 @@
  ******************************************************************************
  *****************************************************************************/
 
-#include "SprdVsyncEvent.h"
-#include <hardware/hwcomposer.h>
-#include <cutils/log.h>
 #include <fcntl.h>
 #include <linux/fb.h>
 #include <sys/ioctl.h>
 
+#include <hardware/hwcomposer.h>
+#include <log/log.h>
+
+#include "SprdVsyncEvent.h"
 #include "SprdFrameBufferHAL.h"
 #include "../SprdDisplayDevice.h"
 

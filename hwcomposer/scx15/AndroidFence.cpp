@@ -40,7 +40,7 @@
 #include <ion/ion.h>
 #include <linux/ion.h>
 #include <video/ion_sprd.h>
-#include <cutils/log.h>
+#include <log/log.h>
 
 #include "AndroidFence.h"
 #include "SprdDisplayDevice.h"

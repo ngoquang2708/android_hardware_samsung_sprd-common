@@ -48,7 +48,7 @@
 #include <utils/RefBase.h>
 #include <cutils/properties.h>
 #include <cutils/atomic.h>
-#include <cutils/log.h>
+#include <log/log.h>
 
 #include "SprdPrimaryDisplayDevice/SprdPrimaryDisplayDevice.h"
 #include "SprdVirtualDisplayDevice/SprdVirtualDisplayDevice.h"

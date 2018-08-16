@@ -34,7 +34,7 @@
 
 #include <stdint.h>
 #include <errno.h>
-#include <cutils/log.h>
+#include <log/log.h>
 
 #include "gralloc_priv.h"
 

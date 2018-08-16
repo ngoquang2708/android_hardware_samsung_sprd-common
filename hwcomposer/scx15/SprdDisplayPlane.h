@@ -43,7 +43,7 @@
 #include <hardware/hwcomposer.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <cutils/log.h>
+#include <log/log.h>
 #include <utils/Vector.h>
 #include <utils/Condition.h>
 #include <utils/Mutex.h>

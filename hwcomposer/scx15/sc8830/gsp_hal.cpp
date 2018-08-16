@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include <cutils/log.h>
 #include <linux/fb.h>
 #include <stdint.h>
 #include <string.h>
@@ -27,14 +26,14 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
+#include <log/log.h>
+
 #include <system/graphics.h>
+
 #include "gralloc_priv.h"
 #include "gsp_hal.h"
-//#include "scale_rotate.h"
-
 
 static int debugenable = 0;
-
 
 static int32_t gsp_hal_layer0_params_check (GSP_LAYER0_CONFIG_INFO_T *layer0_info)
 {
