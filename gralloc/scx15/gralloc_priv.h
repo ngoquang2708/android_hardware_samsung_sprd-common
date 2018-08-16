@@ -31,7 +31,7 @@
 #include <hardware/gralloc.h>
 #include <cutils/native_handle.h>
 #include <alloc_device.h>
-#include <utils/Log.h>
+#include <log/log.h>
 
 /* NOTE:
  * If your framebuffer device driver is integrated with dma_buf, you will have to
