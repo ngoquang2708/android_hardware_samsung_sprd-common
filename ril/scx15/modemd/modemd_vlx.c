@@ -11,7 +11,7 @@
 #include <sys/ioctl.h>
 #include <mtd/mtd-user.h>
 #include <cutils/properties.h>
-#include <utils/Log.h>
+#include <log/log.h>
 #include "modemd.h"
 
 //#define TEST_MODEM

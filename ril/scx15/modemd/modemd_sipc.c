@@ -6,8 +6,9 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <pthread.h>
 #include <cutils/properties.h>
-#include <utils/Log.h>
+#include <log/log.h>
 #include <cutils/sockets.h>
 #include "modemd.h"
 #include <sys/epoll.h>

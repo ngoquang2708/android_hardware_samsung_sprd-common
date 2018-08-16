@@ -6,6 +6,9 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
 
+LOCAL_C_INCLUDES := \
+    hardware/ril/include
+
 LOCAL_SRC_FILES:= \
     secril-client.cpp
 

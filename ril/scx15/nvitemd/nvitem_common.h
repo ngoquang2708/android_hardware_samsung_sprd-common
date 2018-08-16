@@ -18,7 +18,7 @@
 
 #define LOG_TAG "NVITEM"
 //#define LOG_NDEBUG 0
-#include <cutils/log.h>
+#include <log/log.h>
 #define NVITEM_PRINT ALOGD
 #endif
 
