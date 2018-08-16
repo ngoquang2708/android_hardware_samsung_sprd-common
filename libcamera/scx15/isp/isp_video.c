@@ -26,7 +26,7 @@
 #include <semaphore.h>
 #include <pthread.h>
 #define LOG_TAG "isp-video"
-#include <cutils/log.h>
+#include <log/log.h>
 #include "isp_param_tune_com.h"
 #include "isp_log.h"
 
