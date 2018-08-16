@@ -17,7 +17,7 @@
 #include "SensorEventQueue.h"
 
 #define DEBUG 0
-#include <cutils/log.h>
+#include <log/log.h>
 #include <cutils/atomic.h>
 #include <hardware/sensors.h>
 
