@@ -19,7 +19,7 @@
  */
 #define LOG_TAG "ion"
 
-#include <cutils/log.h>
+#include <log/log.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
