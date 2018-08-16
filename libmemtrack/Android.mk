@@ -25,7 +25,11 @@ LOCAL_PROPRIETARY_MODULE := true
 LOCAL_C_INCLUDES := \
 	hardware/libhardware/include \
 
+LOCAL_HEADER_LIBRARIES := \
+	libsystem_headers \
+
 LOCAL_SHARED_LIBRARIES := \
+	libcutils \
 	liblog \
 
 LOCAL_SRC_FILES := \
