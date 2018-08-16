@@ -50,7 +50,6 @@ LOCAL_SHARED_LIBRARIES := \
 	libcutils \
 	libbinder \
 	libdl \
-	libandroid_runtime \
 	liblog \
 
 include $(BUILD_SHARED_LIBRARY)
