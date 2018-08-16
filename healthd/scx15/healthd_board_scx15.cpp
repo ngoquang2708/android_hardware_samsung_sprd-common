@@ -30,20 +30,20 @@ void healthd_board_init(struct healthd_config *config)
     config->batteryTechnologyPath = "/sys/class/power_supply/battery/technology";
 }
 
-int healthd_board_battery_update(struct android::BatteryProperties *props)
+int healthd_board_battery_update(struct android::BatteryProperties* /* props */)
 {
     return 1; // Return non-zero to prevent logging battery status heartbeat message to the kernel log
 }
 
-void healthd_board_mode_charger_draw_battery(struct android::BatteryProperties* batProps)
+void healthd_board_mode_charger_draw_battery(struct android::BatteryProperties* /* batProps */)
 {
 }
 
-void healthd_board_mode_charger_battery_update(struct android::BatteryProperties* batProps)
+void healthd_board_mode_charger_battery_update(struct android::BatteryProperties* /* batProps */)
 {
 }
 
-void healthd_board_mode_charger_set_backlight(bool on)
+void healthd_board_mode_charger_set_backlight(bool /* on */)
 {
 }
 
