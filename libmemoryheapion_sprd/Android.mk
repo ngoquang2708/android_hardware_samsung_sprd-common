@@ -33,6 +33,9 @@ LOCAL_C_INCLUDES += \
 LOCAL_EXPORT_C_INCLUDE_DIRS := \
 	$(LOCAL_PATH) \
 
+LOCAL_EXPORT_SHARED_LIBRARY_HEADERS := \
+	libbinder \
+
 LOCAL_SHARED_LIBRARIES := \
 	libbinder \
 	liblog \
