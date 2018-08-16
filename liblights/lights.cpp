@@ -20,13 +20,14 @@
 
 #define LOG_NDEBUG 0
 #define LOG_TAG "LIGHTS"
-#include <cutils/log.h>
+#include <log/log.h>
 #include <hardware/lights.h>
 
 #include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 
